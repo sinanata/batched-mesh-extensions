@@ -1,5 +1,5 @@
 {
-  "name": "@three.ez/package-name",
+  "name": "@three.ez/batched-mesh-extensions",
   "version": "0.0.1",
   "description": "",
   "author": "Andrea Gargaro <devgargaro@gmail.com>",
@@ -9,7 +9,7 @@
   "main": "build/index.cjs",
   "types": "src/index.d.ts",
   "homepage": "",
-  "repository": "https://github.com/agargaro/package-name",
+  "repository": "https://github.com/agargaro/batched-mesh-extensions",
   "exports": {
     ".": {
       "import": {
@@ -39,6 +39,7 @@
   "devDependencies": {
     "@eslint/js": "^9.21.0",
     "@stylistic/eslint-plugin": "^4.1.0",
+    "@three.ez/main": "^0.5.9",
     "@types/three": "^0.174.0",
     "eslint": "^9.21.0",
     "typescript": "^5.7.3",
