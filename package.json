@@ -1,7 +1,7 @@
 {
   "name": "@three.ez/batched-mesh-extensions",
   "version": "0.0.1",
-  "description": "",
+  "description": "Utility extension methods for BatchedMesh",
   "author": "Andrea Gargaro <devgargaro@gmail.com>",
   "license": "MIT",
   "type": "module",
@@ -25,7 +25,8 @@
   "keywords": [
     "three",
     "three.js",
-    "threejs"
+    "threejs",
+    "uniform-per-instance"
   ],
   "scripts": {
     "start": "vite",
