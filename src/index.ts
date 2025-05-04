@@ -16,12 +16,12 @@ declare module 'three' {
   interface BatchedMesh {
     _instanceInfo: InstanceInfo[];
     _geometryInfo: GeometryInfo[];
-    // _indirectTexture: DataTexture;
+    _indirectTexture: DataTexture;
     _matricesTexture: DataTexture;
-    // _multiDrawStarts: Float32Array;
-    // _multiDrawCounts: Float32Array;
-    // _multiDrawCount: number;
-    // _visibilityChanged: boolean;
+    _multiDrawStarts: Float32Array;
+    _multiDrawCounts: Float32Array;
+    _multiDrawCount: number;
+    _visibilityChanged: boolean;
   }
 }
 

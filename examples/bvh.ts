@@ -10,7 +10,7 @@ main.createView({ scene, camera });
 const controls = new OrbitControls(camera, main.renderer.domElement);
 controls.update();
 
-const count = 100000;
+const count = 1000000;
 const box = new BoxGeometry(1, 1, 1);
 const sphere = new SphereGeometry(1, 12, 12);
 const material = new MeshBasicMaterial({ transparent: true, depthWrite: false });
