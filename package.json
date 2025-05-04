@@ -51,5 +51,8 @@
   },
   "peerDependencies": {
     "three": ">=0.159.0"
+  },
+  "dependencies": {
+    "bvh.js": "^0.0.13"
   }
 }

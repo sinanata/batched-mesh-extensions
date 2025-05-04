@@ -1,7 +1,7 @@
 import { BatchedMesh, BoxGeometry, Matrix4, MeshBasicMaterial, Scene, SphereGeometry, Vector3 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
 import { Main, PerspectiveCameraAuto } from '@three.ez/main';
-import { patchBatchedMeshMaterial } from '../src/index.js';
+import { patchBatchedMesh } from '../src/index.js';
 
 const camera = new PerspectiveCameraAuto().translateZ(10);
 const scene = new Scene();
@@ -32,7 +32,7 @@ batchedMesh.setMatrixAt(sphereInstancedId2, new Matrix4().makeTranslation(1, 1, 
 
 /** UNIFORMS PER INSTANCE */
 
-patchBatchedMeshMaterial(batchedMesh);
+patchBatchedMesh(batchedMesh);
 batchedMesh.initUniformsPerInstance({ fragment: { diffuse: 'vec3', opacity: 'float' } });
 
 batchedMesh.setUniformAt(0, 'diffuse', new Vector3(1, 0, 0));

@@ -4,7 +4,7 @@ import { BatchedMesh, WebGLProgramParametersWithUniforms, WebGLRenderer } from '
 // override frustum culling logic
 // };
 
-export function patchBatchedMeshMaterial(batchedMesh: BatchedMesh): void {
+export function patchBatchedMesh(batchedMesh: BatchedMesh): void {
   const material = batchedMesh.material;
   const onBeforeCompileBase = material.onBeforeCompile.bind(material);
 
