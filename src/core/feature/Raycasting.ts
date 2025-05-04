@@ -1,4 +1,4 @@
-import { BatchedMesh, Intersection, Matrix4, Mesh, Ray, Raycaster, Sphere, Vector3 } from 'three';
+import { BatchedMesh, Box3, Intersection, Matrix4, Mesh, Ray, Raycaster, Sphere, Vector3 } from 'three';
 
 declare module 'three' {
   interface BatchedMesh {
@@ -65,6 +65,9 @@ BatchedMesh.prototype.checkObjectIntersection = function (raycaster, objectIndex
   const geometryId = info.geometryIndex;
   const geometryInfo = this._geometryInfo[geometryId];
   _mesh.geometry.setDrawRange(geometryInfo.start, geometryInfo.count);
+
+  _mesh.geometry.boundingBox ??= new Box3();
+  _mesh.geometry.boundingSphere ??= new Sphere();
 
   this.getMatrixAt(objectIndex, _mesh.matrixWorld);
   this.getBoundingBoxAt(geometryId, _mesh.geometry.boundingBox); // TODO do we need both?
