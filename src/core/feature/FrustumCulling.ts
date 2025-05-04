@@ -69,7 +69,8 @@ BatchedMesh.prototype.frustumCulling = function (camera: Camera) {
   const perObjectFrustumCulled = this.perObjectFrustumCulled;
 
   if (!perObjectFrustumCulled && !sortObjects) {
-    return this.updateIndexArray();
+    this.updateIndexArray();
+    return;
   }
 
   if (sortObjects) {
@@ -115,7 +116,7 @@ BatchedMesh.prototype.frustumCulling = function (camera: Camera) {
 };
 
 BatchedMesh.prototype.updateIndexArray = function () {
-  if (!this._visibilityChanged) return this._multiDrawCount;
+  if (!this._visibilityChanged) return;
 
   const index = this.geometry.getIndex();
   const bytesPerElement = index === null ? 1 : index.array.BYTES_PER_ELEMENT;
@@ -198,38 +199,50 @@ BatchedMesh.prototype.BVHCulling = function (camera: Camera) {
 };
 
 BatchedMesh.prototype.linearCulling = function (camera: Camera) {
-  // const array = this.instanceIndex.array;
-  // if (!this.geometry.boundingSphere) this.geometry.computeBoundingSphere();
-  // const bSphere = this._geometry.boundingSphere;
-  // const radius = bSphere.radius;
-  // const center = bSphere.center;
-  // const instancesArrayCount = this._instancesArrayCount;
-  // const geometryCentered = center.x === 0 && center.y === 0 && center.z === 0;
-  // const sortObjects = this._sortObjects;
-  // const onFrustumEnter = this.onFrustumEnter;
-  // let count = 0;
+  const index = this.geometry.getIndex();
+  const bytesPerElement = index === null ? 1 : index.array.BYTES_PER_ELEMENT;
+  const instanceInfo = this._instanceInfo;
+  const geometryInfoList = this._geometryInfo;
+  const sortObjects = this.sortObjects;
+  const multiDrawStarts = this._multiDrawStarts;
+  const multiDrawCounts = this._multiDrawCounts;
+  const indirectArray = this._indirectTexture.image.data;
+  const onFrustumEnter = this.onFrustumEnter;
+  let count = 0;
 
-  // _frustum.setFromProjectionMatrix(_projScreenMatrix);
+  _frustum.setFromProjectionMatrix(_projScreenMatrix);
 
-  // for (let i = 0; i < instancesArrayCount; i++) {
-  //   if (!this.getActiveAndVisibilityAt(i)) continue;
+  for (let i = 0, l = instanceInfo.length; i < l; i++) {
+    const instance = instanceInfo[i];
+    if (!instance.visible || !instance.active) continue;
 
-  //   if (geometryCentered) {
-  //     const maxScale = this.getPositionAndMaxScaleOnAxisAt(i, _sphere.center);
-  //     _sphere.radius = radius * maxScale;
-  //   } else {
-  //     this.applyMatrixAtToSphere(i, _sphere, center, radius);
-  //   }
+    const geometryId = instance.geometryIndex;
+    const geometryInfo = geometryInfoList[geometryId];
 
-  //   if (_frustum.intersectsSphere(_sphere) && (!onFrustumEnter || onFrustumEnter(i, camera))) {
-  //     if (sortObjects) {
-  //       const depth = _position.subVectors(_sphere.center, _cameraPos).dot(_forward);
-  //       _renderList.push(depth, i);
-  //     } else {
-  //       array[count++] = i;
-  //     }
-  //   }
-  // }
+    const bSphere = geometryInfo.boundingSphere;
+    const radius = bSphere.radius;
+    const center = bSphere.center;
+    const geometryCentered = center.x === 0 && center.y === 0 && center.z === 0; // TODO add to geometryInfo?
 
-  // this._multiDrawCount = sortObjects ? _renderList.array.length : count;
+    if (geometryCentered) {
+      const maxScale = this.getPositionAndMaxScaleOnAxisAt(i, _sphere.center);
+      _sphere.radius = radius * maxScale;
+    } else {
+      this.applyMatrixAtToSphere(i, _sphere, center, radius);
+    }
+
+    if (_frustum.intersectsSphere(_sphere) && (!onFrustumEnter || onFrustumEnter(i, camera))) {
+      if (sortObjects) {
+        const depth = _position.subVectors(_sphere.center, _cameraPos).dot(_forward);
+        _renderList.push(i, depth, geometryInfo.start, geometryInfo.count);
+      } else {
+        multiDrawStarts[count] = geometryInfo.start * bytesPerElement;
+        multiDrawCounts[count] = geometryInfo.count;
+        indirectArray[count] = index;
+        count++;
+      }
+    }
+  }
+
+  this._multiDrawCount = sortObjects ? _renderList.array.length : count;
 };

@@ -1,15 +1,15 @@
-import { DataTexture } from 'three';
+import { Box3, DataTexture, Sphere } from 'three';
 
 export * from './core/feature/ComputeBVH.js';
 export * from './core/feature/FrustumCulling.js';
 export * from './core/feature/GetPositionAt.js';
 export * from './core/feature/Raycasting.js';
 export * from './core/feature/Uniforms.js';
-export * from './core/Patch.js';
 export * from './core/utils/BatchedMeshBVH.js';
 export * from './core/utils/MultiDrawRenderList.js';
 export * from './core/utils/SortingUtils.js';
 export * from './core/utils/SquareDataTexture.js';
+export * from './core/Patch.js';
 
 /** @internal */
 declare module 'three' {
@@ -36,4 +36,6 @@ export interface InstanceInfo {
 interface GeometryInfo {
   start: number;
   count: number;
+  boundingSphere: Sphere;
+  boundingBox: Box3;
 }
