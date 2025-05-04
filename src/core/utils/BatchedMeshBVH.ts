@@ -5,24 +5,6 @@ import { BatchedMesh, Box3, Matrix4, Raycaster } from 'three';
 // TODO implement frustumCullingLOD?
 
 /**
- * Parameters for configuring the BVH (Bounding Volume Hierarchy).
- */
-export interface BVHParams {
-  /**
-   * Margin applied to accommodate animated or moving objects.
-   * Improves BVH update performance but slows down frustum culling and raycasting.
-   * For static objects, set to 0 to optimize culling and raycasting efficiency.
-   * @default 0
-   */
-  margin?: number;
-  /**
-   * Enables accurate frustum culling by checking intersections without applying margin to the bounding box.
-   * @default true
-   */
-  accurateCulling?: boolean;
-}
-
-/**
  * Class to manage BVH (Bounding Volume Hierarchy) for `BatchedMesh`.
  * Provides methods for managing bounding volumes, frustum culling, raycasting, and bounding box computation.
  */
@@ -71,7 +53,7 @@ export class BatchedMeshBVH {
    */
   public create(): void {
     const count = this.target.instanceCount;
-    const instancesArrayCount = this.target.maxInstanceCount; // _instancesArrayCount is not exactly the same as maxInstancescCount
+    const instancesArrayCount = this.target._instanceInfo.length; // TODO this may change.. don't like it too much
     const instancesInfo = this.target._instanceInfo;
     const boxes: Float32Array[] = new Array(count); // test if single array and recreation inside node creation is faster due to memory location
     const objects = new Uint32Array(count);
@@ -80,7 +62,7 @@ export class BatchedMeshBVH {
     this.clear();
 
     for (let i = 0; i < instancesArrayCount; i++) {
-      if (!instancesInfo[i].active) continue; // TODO check if undefined returns?
+      if (!instancesInfo[i].active) continue;
       boxes[index] = this.getBox(i, new Float32Array(6));
       objects[index] = i;
       index++;
