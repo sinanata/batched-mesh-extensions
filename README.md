@@ -17,7 +17,7 @@
 This library adds and overrides some `BatchedMesh` methods to improve performance and add new features.
 
 - [**Spatial indexing (dynamic BVH)**](#spatial-indexing-dynamic-bvh): *speed up raycasting and frustum culling.*
-- [**Per-instance uniforms**](#per-instance-uniforms): *assign unique shader data to individual instances. ***WebGLRenderer only***.
+- [**Per-instance uniforms**](#per-instance-uniforms): *assign unique shader data to individual instances.* **WebGLRenderer only.**
 
 ## Live Examples
 
@@ -26,7 +26,9 @@ This library adds and overrides some `BatchedMesh` methods to improve performanc
 - Will be added in the future. Or you consider to contribute with a PR.
 
 **Using three.ez/main**
-- [1kk static trees](https://stackblitz.com/edit/three-ezinstancedmesh2-1kk-static-trees?file=src%2Fmain.ts&embed=1&hideDevTools=1&view=preview)
+
+wip
+<!-- - [1kk static trees](https://stackblitz.com/edit/three-ezinstancedmesh2-1kk-static-trees?file=src%2Fmain.ts&embed=1&hideDevTools=1&view=preview) -->
 
 ## Need help?
 
