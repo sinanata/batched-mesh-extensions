@@ -28,7 +28,7 @@ This library adds and overrides some `BatchedMesh` methods to improve performanc
 **Using three.ez/main (WebGLRenderer)**
 
 - [BVH](https://glitch.com/edit/#!/three-ez-batched-mesh-extensions-bvh)
-<!-- - [Custom uniforms per instance](https://glitch.com/edit/#!/three-ez-batched-mesh-extensions-bvh) -->
+- [Custom uniforms per instance](https://stackblitz.com/edit/three-ez-batchedmesh-extensions?file=src%2Fmain.ts)
 
 ## Need help?
 
@@ -96,6 +96,9 @@ myBatchedMesh.computeBVH(renderer.coordinateSystem, { margin: 0 }); // margin is
 Assign unique shader uniforms to each instance, working with every materials.
 
 ```ts
+import { patchBatchedMesh } from '@three.ez/batched-mesh-extensions';
+
+patchBatchedMesh(batchedMesh);
 myBatchedMesh.initUniformsPerInstance({ vertex: { noise: 'float' }, fragment: { metalness: 'float', roughness: 'float', emissive: 'vec3' } });
 
 myBatchedMesh.setUniformAt(index, 'noise', 0.5);

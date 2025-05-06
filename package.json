@@ -7,17 +7,17 @@
   "type": "module",
   "module": "build/webgl.js",
   "main": "build/webgl.cjs",
-  "types": "src/webgl.d.ts",
+  "types": "src/index_webgl.d.ts",
   "homepage": "",
   "repository": "https://github.com/agargaro/batched-mesh-extensions",
   "exports": {
     ".": {
       "import": {
-        "types": "./src/webgl.d.ts",
+        "types": "./src/index_webgl.d.ts",
         "default": "./build/webgl.js"
       },
       "require": {
-        "types": "./src/webgl.d.ts",
+        "types": "./src/index_webgl.d.ts",
         "default": "./build/webgl.cjs"
       }
     }
