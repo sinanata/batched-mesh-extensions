@@ -27,8 +27,9 @@ This library adds and overrides some `BatchedMesh` methods to improve performanc
 
 **Using three.ez/main (WebGLRenderer)**
 
-- [BVH](https://glitch.com/edit/#!/three-ez-batched-mesh-extensions-bvh)
 - [Custom uniforms per instance](https://stackblitz.com/edit/three-ez-batchedmesh-extensions?file=src%2Fmain.ts)
+- [Compute a BVH](https://glitch.com/edit/#!/three-ez-batched-mesh-extensions-bvh)
+- [Compute a BVH and use three-mesh-bvh](https://glitch.com/edit/#!/three-ez-batched-mesh-extensions-three-mesh-bvh?path=main.js);
 
 ## Need help?
 
@@ -87,6 +88,7 @@ Or you can import it from CDN:
 This works very well if the instances are **mostly static** (updating a BVH can be expensive) and scattered in world space. <br>
 
 Setting a margin makes BVH updating faster, but may make raycasting and frustum culling slightly slower.
+
 ```ts
 myBatchedMesh.computeBVH(renderer.coordinateSystem, { margin: 0 }); // margin is optional
 ```
