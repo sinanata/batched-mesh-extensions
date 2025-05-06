@@ -25,10 +25,10 @@ This library adds and overrides some `BatchedMesh` methods to improve performanc
 
 - Will be added in the future. Or you consider to contribute with a PR.
 
-**Using three.ez/main**
+**Using three.ez/main (WebGLRenderer)**
 
-wip
-<!-- - [1kk static trees](https://stackblitz.com/edit/three-ezinstancedmesh2-1kk-static-trees?file=src%2Fmain.ts&embed=1&hideDevTools=1&view=preview) -->
+- [BVH](https://glitch.com/edit/#!/three-ez-batched-mesh-extensions-bvh)
+<!-- - [Custom uniforms per instance](https://glitch.com/edit/#!/three-ez-batched-mesh-extensions-bvh) -->
 
 ## Need help?
 
@@ -48,13 +48,31 @@ npm install @three.ez/batched-mesh-extensions
 
 Or you can import it from CDN:
 
+### WebGLRenderer
+
 ```html
 <script type="importmap">
 {
   "imports": {
     "three": "https://cdn.jsdelivr.net/npm/three/build/three.module.js",
     "three/addons/": "https://cdn.jsdelivr.net/npm/three/examples/jsm/",
-    "@three.ez/batched-mesh-extensions": "https://cdn.jsdelivr.net/npm/@three.ez/batched-mesh-extensions/build/index.js",
+    "@three.ez/batched-mesh-extensions": "https://cdn.jsdelivr.net/npm/@three.ez/batched-mesh-extensions/build/webgl.js",
+    "bvh.js": "https://cdn.jsdelivr.net/npm/bvh.js/build/index.js"
+  }
+}
+</script>
+```
+
+
+### WebGPURenderer
+
+```html
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three/build/three.webgpu.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three/examples/jsm/",
+    "@three.ez/batched-mesh-extensions": "https://cdn.jsdelivr.net/npm/@three.ez/batched-mesh-extensions/build/webgpu.js",
     "bvh.js": "https://cdn.jsdelivr.net/npm/bvh.js/build/index.js"
   }
 }
