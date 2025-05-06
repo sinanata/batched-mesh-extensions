@@ -1,5 +1,5 @@
-import { box3ToArray, BVH, BVHNode, HybridBuilder, onFrustumIntersectionCallback, onIntersectionCallback, onIntersectionRayCallback, vec3ToArray, WebGLCoordinateSystem } from 'bvh.js';
-import { BatchedMesh, Box3, Matrix4, Raycaster } from 'three';
+import { box3ToArray, BVH, BVHNode, HybridBuilder, onFrustumIntersectionCallback, onIntersectionCallback, onIntersectionRayCallback, vec3ToArray, WebGLCoordinateSystem, WebGPUCoordinateSystem } from 'bvh.js';
+import { BatchedMesh, Box3, CoordinateSystem, Matrix4, Raycaster } from 'three';
 
 // TODO implement getBBoxFromBSphere (add property to geometryInfo)
 // TODO implement frustumCullingLOD?
@@ -36,12 +36,12 @@ export class BatchedMeshBVH {
    * @param margin The margin applied for bounding box calculations (default is 0).
    * @param accurateCulling Flag to enable accurate frustum culling without considering margin (default is true).
    */
-  constructor(target: BatchedMesh, margin = 0, accurateCulling = true) {
+  constructor(target: BatchedMesh, coordinateSystem: CoordinateSystem, margin = 0, accurateCulling = true) {
     this.target = target;
     this.accurateCulling = accurateCulling;
     this._margin = margin;
 
-    this.bvh = new BVH(new HybridBuilder(), WebGLCoordinateSystem);
+    this.bvh = new BVH(new HybridBuilder(), coordinateSystem === 2000 ? WebGLCoordinateSystem : WebGPUCoordinateSystem); // TODO fix in BVH.js
     this._origin = new Float32Array(3);
     this._dir = new Float32Array(3);
     this._cameraPos = new Float32Array(3);

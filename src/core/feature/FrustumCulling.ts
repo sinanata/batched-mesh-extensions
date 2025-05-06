@@ -238,7 +238,7 @@ BatchedMesh.prototype.linearCulling = function (camera: Camera) {
       } else {
         multiDrawStarts[count] = geometryInfo.start * bytesPerElement;
         multiDrawCounts[count] = geometryInfo.count;
-        indirectArray[count] = index;
+        indirectArray[count] = i;
         count++;
       }
     }

@@ -1,4 +1,5 @@
 import { BatchedMesh, Box3, Intersection, Matrix4, Mesh, Ray, Raycaster, Sphere, Vector3 } from 'three';
+import { } from 'three-mesh-bvh'; // include only types
 
 declare module 'three' {
   interface BatchedMesh {
@@ -20,6 +21,9 @@ BatchedMesh.prototype.raycast = function (raycaster, result) {
 
   _mesh.geometry = this.geometry;
   _mesh.material = this.material;
+
+  _mesh.geometry.boundingBox ??= new Box3();
+  _mesh.geometry.boundingSphere ??= new Sphere();
 
   const originalRay = raycaster.ray;
   const originalNear = raycaster.near;
@@ -45,7 +49,6 @@ BatchedMesh.prototype.raycast = function (raycaster, result) {
 BatchedMesh.prototype.raycastInstances = function (raycaster, result) {
   if (this.bvh) {
     this.bvh.raycast(raycaster, (instanceId) => this.checkObjectIntersection(raycaster, instanceId, result));
-    // TODO test with three-mesh-bvh
   } else {
     if (this.boundingSphere === null) this.computeBoundingSphere();
     _sphere.copy(this.boundingSphere);
@@ -64,14 +67,16 @@ BatchedMesh.prototype.checkObjectIntersection = function (raycaster, objectIndex
 
   const geometryId = info.geometryIndex;
   const geometryInfo = this._geometryInfo[geometryId];
-  _mesh.geometry.setDrawRange(geometryInfo.start, geometryInfo.count);
-
-  _mesh.geometry.boundingBox ??= new Box3();
-  _mesh.geometry.boundingSphere ??= new Sphere();
 
   this.getMatrixAt(objectIndex, _mesh.matrixWorld);
-  this.getBoundingBoxAt(geometryId, _mesh.geometry.boundingBox); // TODO do we need both?
-  this.getBoundingSphereAt(geometryId, _mesh.geometry.boundingSphere);
+
+  _mesh.geometry.boundsTree = this.boundsTrees ? this.boundsTrees[geometryId] : undefined; // three-mesh-bvh compatibility
+
+  if (!_mesh.geometry.boundsTree) {
+    this.getBoundingBoxAt(geometryId, _mesh.geometry.boundingBox);
+    this.getBoundingSphereAt(geometryId, _mesh.geometry.boundingSphere);
+    _mesh.geometry.setDrawRange(geometryInfo.start, geometryInfo.count);
+  }
 
   _mesh.raycast(raycaster, _intersections);
 

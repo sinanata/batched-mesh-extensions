@@ -1,14 +1,20 @@
 import { Main, PerspectiveCameraAuto } from '@three.ez/main';
-import { AmbientLight, BatchedMesh, Mesh, BoxGeometry, Color, MeshBasicMaterial, CylinderGeometry, DirectionalLight, Matrix4, MeshLambertMaterial, Quaternion, Scene, SphereGeometry, TorusGeometry, Vector3 } from 'three';
+import { AmbientLight, BatchedMesh, BoxGeometry, Color, CylinderGeometry, DirectionalLight, Matrix4, Mesh, MeshBasicMaterial, MeshLambertMaterial, Quaternion, Scene, SphereGeometry, TorusGeometry, TorusKnotGeometry, Vector3 } from 'three';
+import { acceleratedRaycast, computeBatchedBoundsTree } from 'three-mesh-bvh';
 import { FlyControls } from 'three/addons/Addons.js';
 import '../src/index.js';
 
-const camera = new PerspectiveCameraAuto(50, 0.1, 1000).translateZ(10);
+Mesh.prototype.raycast = acceleratedRaycast;
+BatchedMesh.prototype.computeBoundsTree = computeBatchedBoundsTree;
+
+const camera = new PerspectiveCameraAuto(50, 0.1, 300).translateZ(10);
 const scene = new Scene();
 scene.continuousRaycasting = true;
 scene.cursor = 'crosshair';
 const main = new Main(); // init renderer and other stuff
 main.createView({ scene, camera });
+
+main.raycaster.firstHitOnly = true;
 
 const ambientLight = new AmbientLight();
 scene.add(ambientLight);
@@ -21,24 +27,24 @@ controls.movementSpeed = 70;
 controls.rollSpeed = 0.2;
 scene.on('animate', (e) => controls.update(e.delta));
 
-const count = 1000000;
-const spawnRange = 5000;
+const count = 200000;
+const spawnRange = 2000;
 const halfSpawnRange = spawnRange / 2;
 const material = new MeshLambertMaterial();
 
-const box = new BoxGeometry();
-const sphere = new SphereGeometry(1, 12, 6);
-const cylinder = new CylinderGeometry(1, 1, 1, 16);
-const torus = new TorusGeometry(1, 0.4, 6, 12);
+const torusKnot = new TorusKnotGeometry(1, 0.4, 256, 32);
+const sphere = new SphereGeometry();
+const cylinder = new CylinderGeometry();
+const torus = new TorusGeometry();
 
-const verticesCount = box.attributes.position.count + sphere.attributes.position.count + cylinder.attributes.position.count + torus.attributes.position.count;
-const indexesCount = box.index.array.length + sphere.index.array.length + cylinder.index.array.length + torus.index.array.length;
+const verticesCount = torusKnot.attributes.position.count + sphere.attributes.position.count + cylinder.attributes.position.count + torus.attributes.position.count;
+const indexesCount = torusKnot.index.array.length + sphere.index.array.length + cylinder.index.array.length + torus.index.array.length;
 
 const batchedMesh = new BatchedMesh(count, verticesCount, indexesCount, material);
 batchedMesh.sortObjects = false;
 batchedMesh.cursor = 'none';
 
-batchedMesh.addGeometry(box);
+batchedMesh.addGeometry(torusKnot);
 batchedMesh.addGeometry(sphere);
 batchedMesh.addGeometry(cylinder);
 batchedMesh.addGeometry(torus);
@@ -60,6 +66,7 @@ for (let i = 0; i < count; i++) {
 
 scene.add(batchedMesh);
 
+batchedMesh.computeBoundsTree(); // three-mesh-bvh
 batchedMesh.computeBVH(main.renderer.coordinateSystem);
 
 const intersectionMesh = new Mesh(new BoxGeometry(0.1, 0.1, 1).translate(0, 0, 0.5), new MeshBasicMaterial({ color: 'white' }));

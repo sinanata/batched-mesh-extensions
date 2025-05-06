@@ -1,4 +1,4 @@
-import { BatchedMesh } from 'three';
+import { BatchedMesh, CoordinateSystem } from 'three';
 import { BatchedMeshBVH } from '../utils/BatchedMeshBVH.js';
 
 /**
@@ -27,18 +27,17 @@ declare module 'three' {
      */
     bvh: BatchedMeshBVH;
     /**
-     * Retrieves the position of a specific instance.
-     * @param index The index of the instance.
-     * @param target Optional `Vector3` to store the result.
-     * @returns The position of the instance as a `Vector3`.
+     * Creates and computes the BVH (Bounding Volume Hierarchy) for the instances.
+     * It's recommended to create it when all the instance matrices have been assigned.
+     * Once created it will be updated automatically.
+     * @param coordinateSystem TODO.
+     * @param config Optional configuration parameters object. See `BVHParams` for details.
      */
-    computeBVH(config?: BVHParams): void;
+    computeBVH(coordinateSystem: CoordinateSystem, config?: BVHParams): void;
   }
 }
 
-BatchedMesh.prototype.computeBVH = function (config: BVHParams = {}): void {
-  this.bvh = new BatchedMeshBVH(this, config.margin, config.accurateCulling);
+BatchedMesh.prototype.computeBVH = function (coordinateSystem: CoordinateSystem, config: BVHParams = {}): void {
+  this.bvh = new BatchedMeshBVH(this, coordinateSystem, config.margin, config.accurateCulling);
   this.bvh.create();
-  // this.geometry.computeBoundingBox(); // TODO
-  // this.geometry.computeBoundingSphere();
 };
