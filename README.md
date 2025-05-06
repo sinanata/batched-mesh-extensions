@@ -105,6 +105,16 @@ myBatchedMesh.setUniformAt(index, 'noise', 0.5);
 myBatchedMesh.setUniformAt(index, 'emissive', new Color('red'));
 ```
 
+**It's necessary to manually update the BVH after its creation with the following methods:**
+
+```ts
+myBatchedMesh.bvh.insert(instanceId);
+myBatchedMesh.bvh.insertRange(instanceIdsArray);
+myBatchedMesh.bvh.move(instanceId);
+myBatchedMesh.bvh.delete(instanceId);
+myBatchedMesh.bvh.clear();
+```
+
 ## Special thanks to
 
 - [gkjohnson](https://github.com/gkjohnson)
