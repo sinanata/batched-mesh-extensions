@@ -2,8 +2,11 @@
   
   <h1>Three.ez - BatchedMesh extensions</h1>
   <p>
-    <em>Simplify your <b>three.js</b> application development with <b>three.ez</b>!</em>
+    <em>Simplify your <b>three.js</b> application development with <b>three.ez</b>!</em> <br><br>
+    <b><a href="https://github.com/agargaro/instanced-mesh">three.ez/instanced-mesh</a></b> - Enhanced <code>InstancedMesh</code> with features for performance and usability
   </p>
+
+  <br>
 
   [![Discord](https://img.shields.io/badge/chat-discord-blue?style=flat&logo=discord)](https://discord.gg/MVTwrdX3JM)
   [![npm](https://img.shields.io/npm/v/@three.ez/batched-mesh-extensions)](https://www.npmjs.com/package/@three.ez/batched-mesh-extensions)
@@ -17,7 +20,7 @@
 This library adds and overrides some `BatchedMesh` methods to improve performance and add new features.
 
 - [**Spatial indexing (dynamic BVH)**](#spatial-indexing-dynamic-bvh): *speed up raycasting and frustum culling.*
-- [**Per-instance uniforms**](#per-instance-uniforms): *assign unique shader data to individual instances.* (**WebGLRenderer only)**
+- [**Per-instance uniforms**](#per-instance-uniforms-webglrenderer-only): *assign unique shader data to individual instances.* (**WebGLRenderer only)**
 
 ## Live Examples
 
