@@ -1,25 +1,19 @@
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
-import { viteStaticCopy } from 'vite-plugin-static-copy';
 import { externalizeDeps } from 'vite-plugin-externalize-deps';
 
 export default defineConfig(({ command }) => ({
   publicDir: command === 'build' ? false : 'public',
   build: {
     sourcemap: true,
+    emptyOutDir: false,
     lib: {
-      entry: resolve(__dirname, 'src/index_webgl.ts'),
-      fileName: 'build/webgl',
+      entry: resolve(__dirname, 'src/index_webgpu.ts'),
+      fileName: 'build/webgpu',
       formats: ['es', 'cjs']
     }
   },
   plugins: [
-    externalizeDeps(),
-    viteStaticCopy({
-      targets: [{
-        src: ['LICENSE', 'package.json', 'README.md'],
-        dest: './'
-      }]
-    })
+    externalizeDeps()
   ]
 }));

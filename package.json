@@ -5,20 +5,20 @@
   "author": "Andrea Gargaro <devgargaro@gmail.com>",
   "license": "MIT",
   "type": "module",
-  "module": "build/index.js",
-  "main": "build/index.cjs",
-  "types": "src/index.d.ts",
+  "module": "build/webgl.js",
+  "main": "build/webgl.cjs",
+  "types": "src/webgl.d.ts",
   "homepage": "",
   "repository": "https://github.com/agargaro/batched-mesh-extensions",
   "exports": {
     ".": {
       "import": {
-        "types": "./src/index.d.ts",
-        "default": "./build/index.js"
+        "types": "./src/webgl.d.ts",
+        "default": "./build/webgl.js"
       },
       "require": {
-        "types": "./src/index.d.ts",
-        "default": "./build/index.cjs"
+        "types": "./src/webgl.d.ts",
+        "default": "./build/webgl.cjs"
       }
     }
   },
@@ -26,11 +26,17 @@
     "three",
     "three.js",
     "threejs",
-    "uniform-per-instance"
+    "uniform-per-instance",
+    "bvh",
+    "performance",
+    "BVH",
+    "acceleration",
+    "raycasting",
+    "frustum-culling"
   ],
   "scripts": {
     "start": "vite",
-    "build": "vite build && tsc --build tsconfig.build.json",
+    "build": "vite build && vite build --config vite.config.webgpu.js && tsc --build tsconfig.build.json",
     "lint": "npx eslint --fix",
     "test": "echo todo add tests",
     "publish-patch": "npm version patch --git-tag-version false && npm run build && cd dist && npm publish --access public",

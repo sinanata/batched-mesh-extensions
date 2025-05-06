@@ -1,9 +1,5 @@
 import { BatchedMesh, WebGLProgramParametersWithUniforms, WebGLRenderer } from 'three';
 
-// BatchedMesh.prototype.onBeforeRender = function (id: number, name: string, target?: UniformValueObj): UniformValue {
-// override frustum culling logic
-// };
-
 export function patchBatchedMesh(batchedMesh: BatchedMesh): void {
   const material = batchedMesh.material;
   const onBeforeCompileBase = material.onBeforeCompile.bind(material);
