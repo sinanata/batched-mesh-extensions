@@ -32,7 +32,10 @@
     "BVH",
     "acceleration",
     "raycasting",
-    "frustum-culling"
+    "frustum-culling",
+    "batched-mesh",
+    "LOD",
+    "level-of-detail"
   ],
   "scripts": {
     "start": "vite",
@@ -44,17 +47,17 @@
     "publish-major": "npm version major --git-tag-version false && npm run build && cd dist && npm publish --access public"
   },
   "devDependencies": {
-    "@eslint/js": "^9.21.0",
-    "@stylistic/eslint-plugin": "^4.1.0",
+    "@eslint/js": "^9.26.0",
+    "@stylistic/eslint-plugin": "^4.2.0",
     "@three.ez/main": "^0.5.9",
     "@types/three": "^0.176.0",
-    "eslint": "^9.21.0",
+    "eslint": "^9.26.0",
     "three-mesh-bvh": "^0.9.0",
-    "typescript": "^5.7.3",
-    "typescript-eslint": "^8.25.0",
-    "vite": "^6.2.0",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.32.1",
+    "vite": "^6.3.5",
     "vite-plugin-externalize-deps": "^0.9.0",
-    "vite-plugin-static-copy": "^2.2.0"
+    "vite-plugin-static-copy": "^3.0.0"
   },
   "peerDependencies": {
     "meshoptimizer": ">=0.23.0",

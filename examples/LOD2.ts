@@ -1,18 +1,16 @@
 import { getBatchedMeshLODCount, patchBatchedMesh, simplifyGeometries } from '@three.ez/batched-mesh-extensions';
 import { Main, PerspectiveCameraAuto } from '@three.ez/main';
 import { AmbientLight, BatchedMesh, Color, DirectionalLight, Fog, Matrix4, MeshStandardMaterial, Quaternion, Scene, TorusKnotGeometry, Vector3, WebGLCoordinateSystem } from 'three';
-import { FirstPersonControls } from 'three/examples/jsm/Addons.js';
+import { MapControls } from 'three/examples/jsm/Addons.js';
 
 const instancesCount = 1000000;
-const camera = new PerspectiveCameraAuto(50, 0.1, 700).translateZ(10).translateY(20);
+const camera = new PerspectiveCameraAuto(50, 0.1, 600).translateZ(50).translateY(10);
 const scene = new Scene();
-scene.fog = new Fog(0x000000, 650, 700);
+scene.fog = new Fog(0x000000, 550, 600);
 const main = new Main(); // init renderer and other stuff
 main.createView({ scene, camera, enabled: false });
 
-const controls = new FirstPersonControls(camera, main.renderer.domElement);
-controls.movementSpeed = 70;
-controls.lookSpeed = 0.02;
+const controls = new MapControls(camera, main.renderer.domElement);
 scene.on('animate', (e) => controls.update(e.delta));
 
 const geoA = new TorusKnotGeometry(1, 0.4, 64, 8, 2, 3);
@@ -23,8 +21,8 @@ const geoD = new TorusKnotGeometry(1, 0.4, 64, 8, 5, 5);
 // CREATE SIMPLIFIED GEOMETRIES
 
 const params = [
-  { error: 1, ratio: 0.4, lockBorder: true },
-  { error: 1, ratio: 0.2, lockBorder: true },
+  { error: 1, ratio: 0.5, lockBorder: true },
+  { error: 1, ratio: 0.25, lockBorder: true },
   { error: 1, ratio: 0.05 }
 ];
 const geometries = await simplifyGeometries([geoA, geoB, geoC, geoD], params);
@@ -40,7 +38,7 @@ batchedMesh.sortObjects = false;
 for (let i = 0; i < geometries.length; i++) {
   const geometryLOD = geometries[i];
   const geometryId = batchedMesh.addGeometry(geometryLOD[0], -1, LODIndexCount[i]);
-  batchedMesh.addGeometryLOD(geometryId, geometryLOD[1], 20);
+  batchedMesh.addGeometryLOD(geometryId, geometryLOD[1], 50);
   batchedMesh.addGeometryLOD(geometryId, geometryLOD[2], 150);
   batchedMesh.addGeometryLOD(geometryId, geometryLOD[3], 350);
 }
@@ -59,7 +57,7 @@ const quaternion = new Quaternion();
 const scale = new Vector3(1, 1, 1);
 
 const sqrtCount = Math.ceil(Math.sqrt(instancesCount));
-const size = 5;
+const size = 5.5;
 const start = (sqrtCount / -2 * size) + (size / 2);
 
 for (let i = 0; i < instancesCount; i++) {
