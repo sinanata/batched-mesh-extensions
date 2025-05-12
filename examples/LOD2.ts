@@ -1,7 +1,7 @@
 import { getBatchedMeshLODCount, patchBatchedMesh, simplifyGeometries } from '@three.ez/batched-mesh-extensions';
 import { Main, PerspectiveCameraAuto } from '@three.ez/main';
 import { AmbientLight, BatchedMesh, Color, DirectionalLight, Fog, Matrix4, MeshStandardMaterial, Quaternion, Scene, TorusKnotGeometry, Vector3, WebGLCoordinateSystem } from 'three';
-import { FlyControls } from 'three/examples/jsm/Addons.js';
+import { FirstPersonControls } from 'three/examples/jsm/Addons.js';
 
 const instancesCount = 1000000;
 const camera = new PerspectiveCameraAuto(50, 0.1, 700).translateZ(10).translateY(20);
@@ -10,9 +10,9 @@ scene.fog = new Fog(0x000000, 650, 700);
 const main = new Main(); // init renderer and other stuff
 main.createView({ scene, camera, enabled: false });
 
-const controls = new FlyControls(camera, main.renderer.domElement);
+const controls = new FirstPersonControls(camera, main.renderer.domElement);
 controls.movementSpeed = 70;
-controls.rollSpeed = 0.2;
+controls.lookSpeed = 0.02;
 scene.on('animate', (e) => controls.update(e.delta));
 
 const geoA = new TorusKnotGeometry(1, 0.4, 64, 8, 2, 3);
@@ -74,7 +74,7 @@ for (let i = 0; i < instancesCount; i++) {
   batchedMesh.setUniformAt(id, 'roughness', Math.random());
 }
 
-// // COMPUTE TLAS BVH
+// COMPUTE TLAS BVH
 
 batchedMesh.computeBVH(WebGLCoordinateSystem);
 
