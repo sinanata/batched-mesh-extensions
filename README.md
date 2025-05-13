@@ -62,7 +62,8 @@ Or you can import it from CDN:
     "three": "https://cdn.jsdelivr.net/npm/three/build/three.module.js",
     "three/addons/": "https://cdn.jsdelivr.net/npm/three/examples/jsm/",
     "@three.ez/batched-mesh-extensions": "https://cdn.jsdelivr.net/npm/@three.ez/batched-mesh-extensions/build/webgl.js",
-    "bvh.js": "https://cdn.jsdelivr.net/npm/bvh.js/build/index.js"
+    "bvh.js": "https://cdn.jsdelivr.net/npm/bvh.js/build/index.js",
+    "meshoptimizer": "https://cdn.jsdelivr.net/npm/meshoptimizer@0.23.0/+esm"
   }
 }
 </script>
@@ -78,7 +79,8 @@ Or you can import it from CDN:
     "three": "https://cdn.jsdelivr.net/npm/three/build/three.webgpu.js",
     "three/addons/": "https://cdn.jsdelivr.net/npm/three/examples/jsm/",
     "@three.ez/batched-mesh-extensions": "https://cdn.jsdelivr.net/npm/@three.ez/batched-mesh-extensions/build/webgpu.js",
-    "bvh.js": "https://cdn.jsdelivr.net/npm/bvh.js/build/index.js"
+    "bvh.js": "https://cdn.jsdelivr.net/npm/bvh.js/build/index.js",
+    "meshoptimizer": "https://cdn.jsdelivr.net/npm/meshoptimizer@0.23.0/+esm"
   }
 }
 </script>
@@ -97,6 +99,16 @@ Setting a margin makes BVH updating faster, but may make raycasting and frustum 
 myBatchedMesh.computeBVH(renderer.coordinateSystem, { margin: 0 }); // margin is optional
 ```
 
+**It's necessary to manually update the BVH after its creation with the following methods:**
+
+```ts
+myBatchedMesh.bvh.insert(instanceId);
+myBatchedMesh.bvh.insertRange(instanceIdsArray);
+myBatchedMesh.bvh.move(instanceId);
+myBatchedMesh.bvh.delete(instanceId);
+myBatchedMesh.bvh.clear();
+```
+
 ### Per-instance uniforms (WebGLRenderer only)
 
 Assign unique shader uniforms to each instance, working with every materials.
@@ -111,15 +123,19 @@ myBatchedMesh.setUniformAt(index, 'noise', 0.5);
 myBatchedMesh.setUniformAt(index, 'emissive', new Color('red'));
 ```
 
-**It's necessary to manually update the BVH after its creation with the following methods:**
+### Level of Detail (LOD)
+
+Improve rendering performance by dynamically adjusting the detail level of instances based on their distance from the camera. <br>
+Use simplified geometries for distant objects to optimize resources.
+
+Currently, only LODs that share the same geometry vertex array can be added. This will improve in the future.
 
 ```ts
-myBatchedMesh.bvh.insert(instanceId);
-myBatchedMesh.bvh.insertRange(instanceIdsArray);
-myBatchedMesh.bvh.move(instanceId);
-myBatchedMesh.bvh.delete(instanceId);
-myBatchedMesh.bvh.clear();
-```
+const geometryId = batchedMesh.addGeometry(geometry, -1, reservedIndexCount);
+batchedMesh.addGeometryLOD(geometryId, geometryLOD1, distanceLOD1);
+batchedMesh.addGeometryLOD(geometryId, geometryLOD2, distanceLOD2);
+batchedMesh.addGeometryLOD(geometryId, geometryLOD3, distanceLOD3);
+```  
 
 ## Special thanks to
 
