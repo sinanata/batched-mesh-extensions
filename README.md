@@ -32,7 +32,8 @@ This library adds and overrides some `BatchedMesh` methods to improve performanc
 
 - [Custom uniforms per instance](https://stackblitz.com/edit/three-ez-batchedmesh-extensions?file=src%2Fmain.ts)
 - [Compute a BVH](https://glitch.com/edit/#!/three-ez-batched-mesh-extensions-bvh)
-- [Compute a BVH and use three-mesh-bvh](https://glitch.com/edit/#!/three-ez-batched-mesh-extensions-three-mesh-bvh?path=main.js);
+- [Compute a BVH and use three-mesh-bvh](https://glitch.com/edit/#!/three-ez-batched-mesh-extensions-three-mesh-bvh?path=main.js)
+- [LOD](https://glitch.com/edit/#!/three-ez-batched-mesh-extensions-lod?path=main.js)
 
 ## Need help?
 
