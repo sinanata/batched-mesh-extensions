@@ -21,6 +21,7 @@ This library adds and overrides some `BatchedMesh` methods to improve performanc
 
 - [**Spatial indexing (dynamic BVH)**](#spatial-indexing-dynamic-bvh): *speed up raycasting and frustum culling.*
 - [**Per-instance uniforms**](#per-instance-uniforms-webglrenderer-only): *assign unique shader data to individual instances.* (**WebGLRenderer only)**
+- [**Level of Detail (LOD)**](#level-of-detail-lod): *dynamically adjust instance detail based on distance.*
 
 ## Live Examples
 
