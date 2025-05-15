@@ -38,10 +38,10 @@ export default defineConfig({
         alt: 'logo-samoyed-mascot',
       },
       favicon: './favicon.ico',
-      social: {
-        github: 'https://github.com/agargaro/batched-mesh-extensions',
-        discord: 'https://discord.gg/MVTwrdX3JM',
-      },
+      social: [
+        { icon: 'github', label: 'GitHub', href: 'https://github.com/agargaro/batched-mesh-extensions' },
+        { icon: 'discord', label: 'Discord', href: 'https://discord.gg/MVTwrdX3JM' }
+      ],
       sidebar: [
         {
           label: 'Getting Started',

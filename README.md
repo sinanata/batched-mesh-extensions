@@ -142,4 +142,5 @@ batchedMesh.addGeometryLOD(geometryId, geometryLOD3, distanceLOD3);
 
 - [gkjohnson](https://github.com/gkjohnson)
 - [manthrax](https://github.com/manthrax)
-  
+- [donmccurdy](https://github.com/donmccurdy)  
+- [ctrlmonster](https://github.com/Ctrlmonster)
