@@ -1,4 +1,4 @@
-import { getBatchedMeshLODCount, patchBatchedMesh, simplifyGeometries } from '@three.ez/batched-mesh-extensions';
+import { getBatchedMeshLODCount, simplifyGeometries } from '@three.ez/batched-mesh-extensions';
 import { Main, PerspectiveCameraAuto } from '@three.ez/main';
 import { AmbientLight, BatchedMesh, Color, DirectionalLight, Fog, Matrix4, MeshStandardMaterial, Quaternion, Scene, TorusKnotGeometry, Vector3, WebGLCoordinateSystem } from 'three';
 import { MapControls } from 'three/examples/jsm/Addons.js';
@@ -45,7 +45,6 @@ for (let i = 0; i < geometries.length; i++) {
 
 // INIT UNIFORMS PER INSTANCE PATCH
 
-patchBatchedMesh(batchedMesh);
 batchedMesh.initUniformsPerInstance({ fragment: { metalness: 'float', roughness: 'float' } });
 
 // ADD INSTANCES

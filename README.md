@@ -115,9 +115,6 @@ myBatchedMesh.bvh.clear();
 Assign unique shader uniforms to each instance, working with every materials.
 
 ```ts
-import { patchBatchedMesh } from '@three.ez/batched-mesh-extensions';
-
-patchBatchedMesh(batchedMesh);
 myBatchedMesh.initUniformsPerInstance({ vertex: { noise: 'float' }, fragment: { metalness: 'float', roughness: 'float', emissive: 'vec3' } });
 
 myBatchedMesh.setUniformAt(index, 'noise', 0.5);

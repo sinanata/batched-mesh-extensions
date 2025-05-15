@@ -1,4 +1,4 @@
-import { getBatchedMeshCount, patchBatchedMesh } from '@three.ez/batched-mesh-extensions';
+import { getBatchedMeshCount } from '@three.ez/batched-mesh-extensions';
 import { Main, PerspectiveCameraAuto } from '@three.ez/main';
 import { BatchedMesh, BoxGeometry, Color, Matrix4, MeshBasicMaterial, Scene, SphereGeometry } from 'three';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
@@ -33,7 +33,6 @@ batchedMesh.setMatrixAt(sphereInstancedId2, new Matrix4().makeTranslation(1, 1, 
 
 /** UNIFORMS PER INSTANCE */
 
-patchBatchedMesh(batchedMesh);
 batchedMesh.initUniformsPerInstance({ fragment: { diffuse: 'vec3', opacity: 'float' } });
 
 batchedMesh.setUniformAt(0, 'diffuse', new Color(0xDC0073));
