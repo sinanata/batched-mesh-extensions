@@ -42,7 +42,7 @@ simplifyGeometries(geometries, params).then((geometriesLODArray) => {
 
   const { vertexCount, indexCount, LODIndexCount } = getBatchedMeshLODCount(geometriesLODArray);
   const batchedMesh = new BatchedMesh(instancesCount, vertexCount, indexCount, new MeshStandardMaterial({ metalness: 0.2, roughness: 0.2 }));
-  batchedMesh.customSort = createRadixSort(batchedMesh);
+  batchedMesh.customSort = createRadixSort(batchedMesh) as any; // TODO remove any
 
   // ADD GEOMETRIES AND LODS
 
