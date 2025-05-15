@@ -1,4 +1,4 @@
-export type MultiDrawRenderItem = { index: number; start: number; count: number; depth: number; depthSort: number };
+export type MultiDrawRenderItem = { start: number; count: number; z: number; zSort?: number; index?: number };
 
 /**
  * A class that creates and manages a list of render items, used to determine the rendering order based on depth.
@@ -23,14 +23,14 @@ export class MultiDrawRenderList {
     const index = list.length;
 
     if (index >= pool.length) {
-      pool.push({ index: null, start: null, count: null, depth: null, depthSort: null });
+      pool.push({ start: null, count: null, z: null, zSort: null, index: null });
     }
 
     const item = pool[index];
     item.index = instanceId;
     item.start = start;
     item.count = count;
-    item.depth = depth;
+    item.z = depth;
 
     list.push(item);
   }

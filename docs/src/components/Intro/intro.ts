@@ -1,16 +1,18 @@
-import { getBatchedMeshLODCount, simplifyGeometries } from '@three.ez/batched-mesh-extensions';
+import { createRadixSort, getBatchedMeshLODCount, simplifyGeometries } from '@three.ez/batched-mesh-extensions';
 import { Main, PerspectiveCameraAuto } from '@three.ez/main';
 import { AmbientLight, BatchedMesh, Color, DirectionalLight, Fog, Matrix4, MeshStandardMaterial, Quaternion, Scene, TorusKnotGeometry, Vector3, WebGLCoordinateSystem } from 'three';
-import { MapControls } from 'three/addons/Addons.js';
+import { OrbitControls } from 'three/addons/Addons.js';
 
-const instancesCount = 500000;
-const camera = new PerspectiveCameraAuto(50, 0.1, 600).translateZ(50).translateY(10);
+const instancesCount = 50000;
+const camera = new PerspectiveCameraAuto(50, 0.1, 500).translateZ(50).translateY(10);
 const scene = new Scene();
-scene.fog = new Fog(0x000000, 500, 600);
-const main = new Main({showStats: false, rendererParameters: { canvas: document.getElementById("three-canvas") }}); // init renderer and other stuff
+scene.fog = new Fog(0x000000, 400, 500);
+const main = new Main({ showStats: false, rendererParameters: { canvas: document.getElementById("three-canvas") } }); // init renderer and other stuff
 main.createView({ scene, camera, enabled: false });
 
-const controls = new MapControls(camera, main.renderer.domElement);
+const controls = new OrbitControls(camera, main.renderer.domElement);
+controls.enabled = false;
+controls.autoRotate = true;
 scene.on('animate', (e) => controls.update(e.delta));
 
 const geometries = [
@@ -29,18 +31,18 @@ const geometries = [
 // CREATE SIMPLIFIED GEOMETRIES
 
 const params = [
-  { error: 1, ratio: 0.5, lockBorder: true },
-  { error: 1, ratio: 0.25, lockBorder: true },
+  { error: 1, ratio: 0.5 },
+  { error: 1, ratio: 0.25 },
   { error: 1, ratio: 0.05 }
 ];
 
 simplifyGeometries(geometries, params).then((geometriesLODArray) => {
-  
+
   // CREATE BATCHED MESH
 
   const { vertexCount, indexCount, LODIndexCount } = getBatchedMeshLODCount(geometriesLODArray);
   const batchedMesh = new BatchedMesh(instancesCount, vertexCount, indexCount, new MeshStandardMaterial({ metalness: 0.2, roughness: 0.2 }));
-  batchedMesh.sortObjects = false;
+  batchedMesh.customSort = createRadixSort(batchedMesh);
 
   // ADD GEOMETRIES AND LODS
 
@@ -48,7 +50,7 @@ simplifyGeometries(geometries, params).then((geometriesLODArray) => {
     const geometryLOD = geometriesLODArray[i];
     const geometryId = batchedMesh.addGeometry(geometryLOD[0], -1, LODIndexCount[i]);
     batchedMesh.addGeometryLOD(geometryId, geometryLOD[1], 50);
-    batchedMesh.addGeometryLOD(geometryId, geometryLOD[2], 100);
+    batchedMesh.addGeometryLOD(geometryId, geometryLOD[2], 150);
     batchedMesh.addGeometryLOD(geometryId, geometryLOD[3], 250);
   }
 
@@ -81,5 +83,5 @@ simplifyGeometries(geometries, params).then((geometriesLODArray) => {
   scene.add(batchedMesh, new AmbientLight());
   const dirLight = new DirectionalLight('white', 2);
   camera.add(dirLight, dirLight.target);
-  
+
 });
