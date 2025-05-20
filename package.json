@@ -8,7 +8,7 @@
   "module": "build/webgl.js",
   "main": "build/webgl.cjs",
   "types": "src/index_webgl.d.ts",
-  "homepage": "",
+  "homepage": "https://agargaro.github.io/batched-mesh-extensions/",
   "repository": "https://github.com/agargaro/batched-mesh-extensions",
   "exports": {
     ".": {
