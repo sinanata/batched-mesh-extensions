@@ -95,7 +95,7 @@ BatchedMesh.prototype.getUniformSchemaResult = function (schema: UniformSchemaSh
 
   uniforms.sort((a, b) => b.size - a.size);
 
-  const tempOffset = [];
+  const tempOffset: number[] = [];
   for (const { name, size, type } of uniforms) {
     const offset = this.getUniformOffset(size, tempOffset);
     uniformMap.set(name, { offset, size, type });

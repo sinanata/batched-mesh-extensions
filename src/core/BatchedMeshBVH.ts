@@ -26,10 +26,10 @@ export class BatchedMeshBVH {
    */
   public accurateCulling: boolean;
   protected _margin: number;
-  protected _origin: Float32Array;
-  protected _dir: Float32Array;
-  protected _boxArray: Float32Array;
-  protected _cameraPos: Float32Array;
+  protected _origin = new Float32Array(3);
+  protected _dir = new Float32Array(3);
+  protected _cameraPos = new Float32Array(3);
+  protected _boxArray = new Float32Array(6);
 
   /**
    * @param target The target `BatchedMesh`.
@@ -42,9 +42,6 @@ export class BatchedMeshBVH {
     this._margin = margin;
 
     this.bvh = new BVH(new HybridBuilder(), coordinateSystem === 2000 ? WebGLCoordinateSystem : WebGPUCoordinateSystem); // TODO fix in BVH.js
-    this._origin = new Float32Array(3);
-    this._dir = new Float32Array(3);
-    this._cameraPos = new Float32Array(3);
   }
 
   /**
@@ -170,7 +167,6 @@ export class BatchedMeshBVH {
    * @returns `True` if there is an intersection, otherwise `false`.
    */
   public intersectBox(target: Box3, onIntersection: onIntersectionCallback<number>): boolean {
-    if (!this._boxArray) this._boxArray = new Float32Array(6);
     const array = this._boxArray;
     box3ToArray(target, array);
     return this.bvh.intersectsBox(array, onIntersection);

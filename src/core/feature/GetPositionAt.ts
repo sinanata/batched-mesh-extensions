@@ -19,7 +19,7 @@ const _position = new Vector3();
 
 BatchedMesh.prototype.getPositionAt = function (index: number, target = _position): Vector3 {
   const offset = index * 16;
-  const array = this._matricesTexture.image.data as any;
+  const array = this._matricesTexture.image.data as unknown as number[];
 
   target.x = array[offset + 12];
   target.y = array[offset + 13];
@@ -30,7 +30,7 @@ BatchedMesh.prototype.getPositionAt = function (index: number, target = _positio
 
 BatchedMesh.prototype.getPositionAndMaxScaleOnAxisAt = function (index: number, position: Vector3): number {
   const offset = index * 16;
-  const array = this._matricesTexture.image.data;
+  const array = this._matricesTexture.image.data as unknown as number[];
 
   const te0 = array[offset + 0];
   const te1 = array[offset + 1];
@@ -56,7 +56,7 @@ BatchedMesh.prototype.getPositionAndMaxScaleOnAxisAt = function (index: number, 
 
 BatchedMesh.prototype.applyMatrixAtToSphere = function (index: number, sphere: Sphere, center: Vector3, radius: number): void {
   const offset = index * 16;
-  const array = this._matricesTexture.image.data;
+  const array = this._matricesTexture.image.data as unknown as number[];
 
   const te0 = array[offset + 0];
   const te1 = array[offset + 1];

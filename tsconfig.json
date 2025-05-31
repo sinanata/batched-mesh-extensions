@@ -19,6 +19,7 @@
     "sourceMap": true,
     "strict": true,
     "stripInternal": true,
+    "strictNullChecks": false,
     "target": "ES2020"
   }
 }

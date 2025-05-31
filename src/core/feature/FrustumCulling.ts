@@ -95,7 +95,7 @@ BatchedMesh.prototype.frustumCulling = function (camera, cameraLOD) {
     const bytesPerElement = index === null ? 1 : index.array.BYTES_PER_ELEMENT;
     const multiDrawStarts = this._multiDrawStarts;
     const multiDrawCounts = this._multiDrawCounts;
-    const indirectArray = this._indirectTexture.image.data;
+    const indirectArray = this._indirectTexture.image.data as unknown as number[];
     const customSort = this.customSort as unknown as CustomSortCallback;
 
     if (customSort === null) {
@@ -126,7 +126,7 @@ BatchedMesh.prototype.updateIndexArray = function () {
   const geometryInfoList = this._geometryInfo;
   const multiDrawStarts = this._multiDrawStarts;
   const multiDrawCounts = this._multiDrawCounts;
-  const indirectArray = this._indirectTexture.image.data;
+  const indirectArray = this._indirectTexture.image.data as unknown as number[];
   let count = 0;
 
   for (let i = 0, l = instanceInfo.length; i < l; i++) {
@@ -170,8 +170,8 @@ BatchedMesh.prototype.BVHCulling = function (camera: Camera, cameraLOD: Camera) 
   const sortObjects = this.sortObjects;
   const multiDrawStarts = this._multiDrawStarts;
   const multiDrawCounts = this._multiDrawCounts;
-  const indirectArray = this._indirectTexture.image.data;
-  const onFrustumEnter = this.onFrustumEnter; // TODO add LODs
+  const indirectArray = this._indirectTexture.image.data as unknown as number[];
+  const onFrustumEnter = this.onFrustumEnter;
   let instancesCount = 0;
 
   this.bvh.frustumCulling(_projScreenMatrix, (node: BVHNode<{}, number>) => {
@@ -224,7 +224,7 @@ BatchedMesh.prototype.linearCulling = function (camera: Camera, cameraLOD: Camer
   const sortObjects = this.sortObjects;
   const multiDrawStarts = this._multiDrawStarts;
   const multiDrawCounts = this._multiDrawCounts;
-  const indirectArray = this._indirectTexture.image.data;
+  const indirectArray = this._indirectTexture.image.data as unknown as number[];
   const onFrustumEnter = this.onFrustumEnter;
   let instancesCount = 0;
 
