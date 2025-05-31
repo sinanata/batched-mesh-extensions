@@ -23,7 +23,7 @@ export default defineConfig({
       plugins: [
         // Generate the documentation.
         starlightTypeDoc({
-          entryPoints: ['../src/index_webgl.ts', /** '../src/index_webgpu.ts'*/],
+          entryPoints: ['../src/index.webgl.ts', /** '../src/index.webgpu.ts'*/],
           typeDoc: {
             exclude: ['./examples/**/*'],
             skipErrorChecking: true,

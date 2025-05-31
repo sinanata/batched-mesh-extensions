@@ -1,4 +1,4 @@
-import { extendBatchedMeshPrototype } from '@three.ez/batched-mesh-extensions';
+import { extendBatchedMeshPrototype } from '../src/index.webgl';
 import { Asset, Main, PerspectiveCameraAuto } from '@three.ez/main';
 import { AmbientLight, DirectionalLight, Mesh, MeshNormalMaterial, Scene, TorusKnotGeometry } from 'three';
 import { GLTF, GLTFLoader, OrbitControls } from 'three/examples/jsm/Addons.js';

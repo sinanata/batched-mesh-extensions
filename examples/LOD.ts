@@ -1,4 +1,4 @@
-import { extendBatchedMeshPrototype, getBatchedMeshCount, getBatchedMeshLODCount } from '@three.ez/batched-mesh-extensions';
+import { extendBatchedMeshPrototype, getBatchedMeshCount, getBatchedMeshLODCount } from '../src/index.webgl';
 import { Main, PerspectiveCameraAuto } from '@three.ez/main';
 import { AmbientLight, BatchedMesh, DirectionalLight, Matrix4, MeshLambertMaterial, Scene, SphereGeometry, TorusKnotGeometry, WebGLCoordinateSystem } from 'three';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';

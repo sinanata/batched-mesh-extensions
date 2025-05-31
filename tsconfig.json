@@ -12,7 +12,7 @@
     "outDir": "dist/src",
     "paths": {
       "@three.ez/batched-mesh-extensions": [
-        "./src/index_webgl.js"
+        "./src/index.webgl.js"
       ]
     },
     "skipLibCheck": true,

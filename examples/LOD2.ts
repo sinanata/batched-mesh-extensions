@@ -1,4 +1,4 @@
-import { createRadixSort, extendBatchedMeshPrototype, getBatchedMeshLODCount } from '@three.ez/batched-mesh-extensions';
+import { createRadixSort, extendBatchedMeshPrototype, getBatchedMeshLODCount } from '../src/index.webgl.js';
 import { Main, PerspectiveCameraAuto } from '@three.ez/main';
 import { AmbientLight, BatchedMesh, Color, DirectionalLight, Fog, Matrix4, MeshStandardMaterial, Quaternion, Scene, TorusKnotGeometry, Vector3, WebGLCoordinateSystem } from 'three';
 import { MapControls } from 'three/examples/jsm/Addons.js';

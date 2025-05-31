@@ -1,7 +1,7 @@
 import { Main, PerspectiveCameraAuto } from '@three.ez/main';
 import { AmbientLight, BatchedMesh, Mesh, BoxGeometry, Color, MeshBasicMaterial, CylinderGeometry, DirectionalLight, Matrix4, MeshLambertMaterial, Quaternion, Scene, SphereGeometry, TorusGeometry, Vector3 } from 'three';
 import { FlyControls } from 'three/addons/Addons.js';
-import { extendBatchedMeshPrototype } from '@three.ez/batched-mesh-extensions';
+import { extendBatchedMeshPrototype } from '../src/index.webgl';
 
 extendBatchedMeshPrototype();
 

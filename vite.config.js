@@ -7,13 +7,13 @@ export default defineConfig(({ command }) => ({
   publicDir: command === 'build' ? false : 'public',
   resolve: {
     alias: {
-      '@three.ez/batched-mesh-extensions': resolve(__dirname, 'src/index_webgl.ts')
+      '@three.ez/batched-mesh-extensions': resolve(__dirname, 'src/index.webgl.ts')
     }
   },
   build: {
     sourcemap: true,
     lib: {
-      entry: resolve(__dirname, 'src/index_webgl.ts'),
+      entry: resolve(__dirname, 'src/index.webgl.ts'),
       fileName: 'build/webgl',
       formats: ['es', 'cjs']
     }

@@ -8,7 +8,7 @@ export default defineConfig(({ command }) => ({
     sourcemap: true,
     emptyOutDir: false,
     lib: {
-      entry: resolve(__dirname, 'src/index_webgpu.ts'),
+      entry: resolve(__dirname, 'src/index.webgpu.ts'),
       fileName: 'build/webgpu',
       formats: ['es', 'cjs']
     }
