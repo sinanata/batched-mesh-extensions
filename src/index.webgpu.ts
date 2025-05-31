@@ -1,14 +1,14 @@
-export * from './core/BatchedMeshBVH.js';
-export * from './core/MultiDrawRenderList.js';
+export * from './core/BatchedMeshBVH';
+export * from './core/MultiDrawRenderList';
 
-export * from './core/feature/ComputeBVH.js';
-export * from './core/feature/FrustumCulling.js';
-export * from './core/feature/GetPositionAt.js';
-export * from './core/feature/LOD.js';
-export * from './core/feature/Raycasting.js';
+export * from './core/feature/ComputeBVH';
+export * from './core/feature/FrustumCulling';
+export * from './core/feature/GetPositionAt';
+export * from './core/feature/LOD';
+export * from './core/feature/Raycasting';
 
-export * from './patch/ExtendsBatchedMeshPrototype.webgpu.js';
-export * from './patch/PatchBatchedMeshMaterial.js';
+export * from './patch/ExtendsBatchedMeshPrototype.webgpu';
+export * from './patch/PatchBatchedMeshMaterial';
 
-export * from './utils/CountUtils.js';
-export * from './utils/SortingUtils.js';
+export * from './utils/CountUtils';
+export * from './utils/SortingUtils';

@@ -1,6 +1,6 @@
 import { BatchedMesh } from 'three';
-import { ChannelSize, SquareDataTexture, UniformMap, UniformMapType, UniformType, UniformValue, UniformValueObj } from '../SquareDataTexture.js';
-import { patchBatchedMeshMaterial } from '../../patch/PatchBatchedMeshMaterial.js';
+import { ChannelSize, SquareDataTexture, UniformMap, UniformMapType, UniformType, UniformValue, UniformValueObj } from '../SquareDataTexture';
+import { patchBatchedMeshMaterial } from '../../patch/PatchBatchedMeshMaterial';
 
 export type UniformSchema = { [x: string]: UniformType };
 export type UniformSchemaShader = { vertex?: UniformSchema; fragment?: UniformSchema };

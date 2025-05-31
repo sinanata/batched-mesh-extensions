@@ -2,7 +2,7 @@ import { Asset, Main, PerspectiveCameraAuto } from '@three.ez/main';
 import { AmbientLight, BufferGeometry, BufferGeometryLoader, DirectionalLight, Mesh, MeshLambertMaterial, Scene } from 'three';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
 import { simplifyGeometryByAppearanceLOD } from '../src/simplify/simplifyGeometryByAppearanceLOD.js';
-import { extendBatchedMeshPrototype } from '../src/index.webgl.js';
+import { extendBatchedMeshPrototype } from '@three.ez/batched-mesh-extensions';
 
 extendBatchedMeshPrototype();
 

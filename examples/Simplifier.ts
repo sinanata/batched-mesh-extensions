@@ -1,4 +1,4 @@
-import { extendBatchedMeshPrototype } from '../src/index.webgl';
+import { extendBatchedMeshPrototype } from '@three.ez/batched-mesh-extensions';
 import { Asset, Main, PerspectiveCameraAuto } from '@three.ez/main';
 import { AmbientLight, DirectionalLight, Mesh, MeshNormalMaterial, Scene, TorusKnotGeometry } from 'three';
 import { GLTF, GLTFLoader, OrbitControls } from 'three/examples/jsm/Addons.js';
@@ -10,9 +10,9 @@ extendBatchedMeshPrototype();
 
 const main = new Main();
 
-const glb = await Asset.load<GLTF>(GLTFLoader, 'https://threejs.org/examples/models/gltf/Soldier.glb');
-const soldierGroup = glb.scene.children[0];
-const dummy = soldierGroup.children[0] as Mesh;
+// const glb = await Asset.load<GLTF>(GLTFLoader, 'https://threejs.org/examples/models/gltf/Soldier.glb');
+// const soldierGroup = glb.scene.children[0];
+// const dummy = soldierGroup.children[0] as Mesh;
 
 // const originalGeometry = mesh.geometry.rotateX(Math.PI / -2).rotateY(Math.PI);
 const originalGeometry = new TorusKnotGeometry();

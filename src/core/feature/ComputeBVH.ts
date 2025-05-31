@@ -1,5 +1,5 @@
 import { BatchedMesh, CoordinateSystem } from 'three';
-import { BatchedMeshBVH } from '../BatchedMeshBVH.js';
+import { BatchedMeshBVH } from '../BatchedMeshBVH';
 
 /**
  * Parameters for configuring the BVH (Bounding Volume Hierarchy).
