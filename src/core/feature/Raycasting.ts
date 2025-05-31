@@ -3,8 +3,7 @@ import { } from 'three-mesh-bvh'; // include only types
 
 declare module 'three' {
   interface BatchedMesh {
-    /** @internal */ raycastInstances(raycaster: Raycaster, result: Intersection[]): void;
-    /** @internal */ checkObjectIntersection(raycaster: Raycaster, objectIndex: number, result: Intersection[]): void;
+    checkInstanceIntersection(raycaster: Raycaster, objectIndex: number, result: Intersection[]): void;
   }
 }
 
@@ -14,9 +13,8 @@ const _ray = new Ray();
 const _direction = new Vector3();
 const _worldScale = new Vector3();
 const _invMatrixWorld = new Matrix4();
-const _sphere = new Sphere();
 
-BatchedMesh.prototype.raycast = function (raycaster, result) {
+export function raycast(this: BatchedMesh, raycaster: Raycaster, result: Intersection[]): void {
   if (!this.material || this.instanceCount === 0) return;
 
   _mesh.geometry = this.geometry;
@@ -39,36 +37,31 @@ BatchedMesh.prototype.raycast = function (raycaster, result) {
   raycaster.near /= scaleFactor;
   raycaster.far /= scaleFactor;
 
-  this.raycastInstances(raycaster, result);
+  if (this.bvh) {
+    this.bvh.raycast(raycaster, (instanceId) => this.checkInstanceIntersection(raycaster, instanceId, result));
+  } else {
+    if (this.boundingSphere === null) this.computeBoundingSphere();
+
+    if (raycaster.ray.intersectsSphere(this.boundingSphere)) {
+      for (let i = 0, l = this._instanceInfo.length; i < l; i++) {
+        this.checkInstanceIntersection(raycaster, i, result);
+      }
+    }
+  }
 
   raycaster.ray = originalRay;
   raycaster.near = originalNear;
   raycaster.far = originalFar;
-};
+}
 
-BatchedMesh.prototype.raycastInstances = function (raycaster, result) {
-  if (this.bvh) {
-    this.bvh.raycast(raycaster, (instanceId) => this.checkObjectIntersection(raycaster, instanceId, result));
-  } else {
-    if (this.boundingSphere === null) this.computeBoundingSphere();
-    _sphere.copy(this.boundingSphere);
-    if (!raycaster.ray.intersectsSphere(_sphere)) return;
-
-    // TODO this._instanceInfo.length may change
-    for (let i = 0, l = this._instanceInfo.length; i < l; i++) {
-      this.checkObjectIntersection(raycaster, i, result);
-    }
-  }
-};
-
-BatchedMesh.prototype.checkObjectIntersection = function (raycaster, objectIndex, result) {
-  const info = this._instanceInfo[objectIndex];
+export function checkInstanceIntersection(this: BatchedMesh, raycaster: Raycaster, instanceId: number, result: Intersection[]): void {
+  const info = this._instanceInfo[instanceId];
   if (!info.active || !info.visible) return;
 
   const geometryId = info.geometryIndex;
   const geometryInfo = this._geometryInfo[geometryId];
 
-  this.getMatrixAt(objectIndex, _mesh.matrixWorld);
+  this.getMatrixAt(instanceId, _mesh.matrixWorld);
 
   _mesh.geometry.boundsTree = this.boundsTrees ? this.boundsTrees[geometryId] : undefined; // three-mesh-bvh compatibility
 
@@ -81,10 +74,10 @@ BatchedMesh.prototype.checkObjectIntersection = function (raycaster, objectIndex
   _mesh.raycast(raycaster, _intersections);
 
   for (const intersect of _intersections) {
-    intersect.batchId = objectIndex;
+    intersect.batchId = instanceId;
     intersect.object = this;
     result.push(intersect);
   }
 
   _intersections.length = 0;
-};
+}
