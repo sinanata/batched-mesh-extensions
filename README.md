@@ -20,21 +20,21 @@
 This library adds and overrides some `BatchedMesh` methods to improve performance and add new features.
 
 ```ts
-// Extends batchedMesh prototype with new methods
+// Extends BatchedMesh prototype with new methods
 extendBatchedMeshPrototype();
 
-// Calculate the number of vertices and indices for a batchedMesh and create it
+// Calculate the number of vertices and indices for a BatchedMesh and create it
 const { vertexCount, indexCount } = getBatchedMeshCount(geometries);
-const batchedMesh = new BatchedMesh(instanceCount, vertexCount, indexCount, material);
+const myBatchedMesh = new BatchedMesh(instanceCount, vertexCount, indexCount, material);
 
 // Add geometries
-const geoId = batchedMesh.addGeometry(geometries[geometryIndex]);
+const geoId = myBatchedMesh.addGeometry(geometries[geometryIndex]);
 
 // Add instances
-const instanceId = batchedMesh.addInstance(geoId);
+const instanceId = myBatchedMesh.addInstance(geoId);
 
 // Compute the BVH to accelerate raycasting and frustum culling after adding all instances
-batchedMesh.computeBVH();
+myBatchedMesh.computeBVH();
 ```
 
 - [**Spatial indexing (dynamic BVH)**](#spatial-indexing-dynamic-bvh): *speed up raycasting and frustum culling.*
