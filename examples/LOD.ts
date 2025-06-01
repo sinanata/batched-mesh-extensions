@@ -1,55 +1,82 @@
-import { extendBatchedMeshPrototype, getBatchedMeshCount, getBatchedMeshLODCount } from '@three.ez/batched-mesh-extensions';
+import { createRadixSort, extendBatchedMeshPrototype, getBatchedMeshLODCount } from '@three.ez/batched-mesh-extensions';
 import { Main, PerspectiveCameraAuto } from '@three.ez/main';
-import { AmbientLight, BatchedMesh, DirectionalLight, Matrix4, MeshLambertMaterial, Scene, SphereGeometry, TorusKnotGeometry, WebGLCoordinateSystem } from 'three';
-import { OrbitControls } from 'three/examples/jsm/Addons.js';
-import { simplifyGeometry } from '../src/simplify/simplifyGeometry.js';
+import { performanceRangeLOD, simplifyGeometriesByErrorLOD } from '@three.ez/simplify-geometry';
+import { AmbientLight, BatchedMesh, Color, DirectionalLight, Fog, Matrix4, MeshStandardMaterial, Quaternion, Scene, TorusKnotGeometry, Vector3, WebGLCoordinateSystem } from 'three';
+import { MapControls } from 'three/examples/jsm/Addons.js';
 
+// EXTEND BATCHEDMESH PROTOTYPE
 extendBatchedMeshPrototype();
 
-const camera = new PerspectiveCameraAuto().translateZ(10);
+const instancesCount = 500000;
+const camera = new PerspectiveCameraAuto(50, 0.1, 600).translateZ(50).translateY(10);
 const scene = new Scene();
+scene.fog = new Fog(0x000000, 500, 600);
 const main = new Main(); // init renderer and other stuff
-main.createView({ scene, camera });
-const controls = new OrbitControls(camera, main.renderer.domElement);
-controls.update();
+main.createView({ scene, camera, enabled: false });
 
-const sphereGeo = new SphereGeometry();
-const torusKnotGeo = new TorusKnotGeometry();
+const controls = new MapControls(camera, main.renderer.domElement);
+scene.on('animate', (e) => controls.update(e.delta));
+
+const geometries = [
+  new TorusKnotGeometry(1, 0.4, 256, 32, 1, 1),
+  new TorusKnotGeometry(1, 0.4, 256, 32, 1, 2),
+  new TorusKnotGeometry(1, 0.4, 256, 32, 1, 3),
+  new TorusKnotGeometry(1, 0.4, 256, 32, 1, 4),
+  new TorusKnotGeometry(1, 0.4, 256, 32, 1, 5),
+  new TorusKnotGeometry(1, 0.4, 256, 32, 2, 1),
+  new TorusKnotGeometry(1, 0.4, 256, 32, 2, 3),
+  new TorusKnotGeometry(1, 0.4, 256, 32, 3, 1),
+  new TorusKnotGeometry(1, 0.4, 256, 32, 4, 1),
+  new TorusKnotGeometry(1, 0.4, 256, 32, 5, 3)
+];
 
 // CREATE SIMPLIFIED GEOMETRIES
 
-const sphereGeoLOD1 = await simplifyGeometry(sphereGeo, { error: 1, ratio: 0.3, lockBorder: true });
-const sphereGeoLOD2 = await simplifyGeometry(sphereGeo, { error: 1, ratio: 0.2, lockBorder: true });
-const torusKnotGeoLOD1 = await simplifyGeometry(torusKnotGeo, { error: 1, ratio: 0.4, lockBorder: true });
-const torusKnotGeoLOD2 = await simplifyGeometry(torusKnotGeo, { error: 1, ratio: 0.2, lockBorder: true });
+const geometriesLODArray = await simplifyGeometriesByErrorLOD(geometries, 4, performanceRangeLOD);
 
 // CREATE BATCHED MESH
 
-const { vertexCount } = getBatchedMeshCount([sphereGeo, torusKnotGeo]);
-const { LODIndexCount, indexCount } = getBatchedMeshLODCount([[sphereGeo, sphereGeoLOD1, sphereGeoLOD2], [torusKnotGeo, torusKnotGeoLOD1, torusKnotGeoLOD2]]);
-const batchedMesh = new BatchedMesh(2, vertexCount, indexCount, new MeshLambertMaterial());
+const { vertexCount, indexCount, LODIndexCount } = getBatchedMeshLODCount(geometriesLODArray);
+const batchedMesh = new BatchedMesh(instancesCount, vertexCount, indexCount, new MeshStandardMaterial({ metalness: 0.2, roughness: 0.2 }));
+batchedMesh.customSort = createRadixSort(batchedMesh);
 
-// ADD GEOMETRIES
+// ADD GEOMETRIES AND LODS
 
-const geometryId = batchedMesh.addGeometry(sphereGeo, -1, LODIndexCount[0]);
-const geometryId2 = batchedMesh.addGeometry(torusKnotGeo, -1, LODIndexCount[1]);
-
-// ADD GEOMETRIES LODS
-
-batchedMesh.addGeometryLOD(geometryId, sphereGeoLOD1, 10);
-batchedMesh.addGeometryLOD(geometryId, sphereGeoLOD2, 40);
-batchedMesh.addGeometryLOD(geometryId2, torusKnotGeoLOD1, 10);
-batchedMesh.addGeometryLOD(geometryId2, torusKnotGeoLOD2, 40);
+for (let i = 0; i < geometriesLODArray.length; i++) {
+  const geometryLOD = geometriesLODArray[i];
+  const geometryId = batchedMesh.addGeometry(geometryLOD[0], -1, LODIndexCount[i]);
+  batchedMesh.addGeometryLOD(geometryId, geometryLOD[1], 15);
+  batchedMesh.addGeometryLOD(geometryId, geometryLOD[2], 75);
+  batchedMesh.addGeometryLOD(geometryId, geometryLOD[3], 125);
+  batchedMesh.addGeometryLOD(geometryId, geometryLOD[4], 200);
+}
 
 // ADD INSTANCES
 
-const sphereInstancedId1 = batchedMesh.addInstance(geometryId);
-const sphereInstancedId2 = batchedMesh.addInstance(geometryId2);
-batchedMesh.setMatrixAt(sphereInstancedId1, new Matrix4().makeTranslation(-1, -1, 0));
-batchedMesh.setMatrixAt(sphereInstancedId2, new Matrix4().makeTranslation(1, 1, 0));
+const color = new Color();
+const matrix = new Matrix4();
+const position = new Vector3();
+const quaternion = new Quaternion();
+const scale = new Vector3(1, 1, 1);
+
+const sqrtCount = Math.ceil(Math.sqrt(instancesCount));
+const size = 5.5;
+const start = (sqrtCount / -2 * size) + (size / 2);
+
+for (let i = 0; i < instancesCount; i++) {
+  const r = Math.floor(i / sqrtCount);
+  const c = i % sqrtCount;
+  const id = batchedMesh.addInstance(Math.floor(Math.random() * geometriesLODArray.length));
+  position.set(c * size + start, 0, r * size + start);
+  quaternion.random();
+  batchedMesh.setMatrixAt(id, matrix.compose(position, quaternion, scale));
+  batchedMesh.setColorAt(id, color.setHSL(Math.random(), 0.6, 0.5));
+}
 
 // COMPUTE TLAS BVH
 
 batchedMesh.computeBVH(WebGLCoordinateSystem);
 
-scene.add(batchedMesh, new DirectionalLight(), new AmbientLight());
+scene.add(batchedMesh, new AmbientLight());
+const dirLight = new DirectionalLight('white', 2);
+camera.add(dirLight, dirLight.target);
