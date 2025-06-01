@@ -1,9 +1,9 @@
 import { BatchedMesh } from 'three';
-import { computeBVH } from '../core/feature/ComputeBVH';
-import { BVHCulling, frustumCulling, linearCulling, onBeforeRender, updateIndexArray, updateRenderList } from '../core/feature/FrustumCulling';
-import { applyMatrixAtToSphere, getPositionAndMaxScaleOnAxisAt, getPositionAt } from '../core/feature/GetPositionAt';
-import { addGeometryLOD, getLODIndex } from '../core/feature/LOD';
-import { checkInstanceIntersection, raycast } from '../core/feature/Raycasting';
+import { computeBVH } from '../core/feature/ComputeBVH.js';
+import { BVHCulling, frustumCulling, linearCulling, onBeforeRender, updateIndexArray, updateRenderList } from '../core/feature/FrustumCulling.js';
+import { applyMatrixAtToSphere, getPositionAndMaxScaleOnAxisAt, getPositionAt } from '../core/feature/GetPositionAt.js';
+import { addGeometryLOD, getLODIndex } from '../core/feature/LOD.js';
+import { checkInstanceIntersection, raycast } from '../core/feature/Raycasting.js';
 
 /**
  * @internal

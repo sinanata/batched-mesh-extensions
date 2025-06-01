@@ -1,6 +1,6 @@
 import { BatchedMesh } from 'three';
 import { radixSort, RadixSortOptions } from 'three/addons/utils/SortUtils.js';
-import { MultiDrawRenderItem } from '../core/MultiDrawRenderList';
+import { MultiDrawRenderItem } from '../core/MultiDrawRenderList.js';
 
 type radixSortCallback = (list: MultiDrawRenderItem[]) => void;
 

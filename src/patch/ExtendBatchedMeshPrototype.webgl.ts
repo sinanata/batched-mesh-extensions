@@ -1,6 +1,6 @@
 import { BatchedMesh } from 'three';
-import { getUniformAt, initUniformsPerInstance, setUniformAt } from '../core/feature/Uniforms';
-import { extendBatchedMeshPrototypeCommon } from './ExtendsBatchedMeshPrototype.common';
+import { getUniformAt, initUniformsPerInstance, setUniformAt } from '../core/feature/Uniforms.js';
+import { extendBatchedMeshPrototypeCommon } from './ExtendBatchedMeshPrototype.common.js';
 
 /**
  * Enhances the BatchedMesh prototype with additional methods.

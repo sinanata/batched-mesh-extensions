@@ -1,22 +1,22 @@
 import type { Box3, DataTexture, Sphere } from 'three';
-import type { LODInfo } from './core/feature/LOD';
+import type { LODInfo } from './core/feature/LOD.js';
 
-export * from './core/BatchedMeshBVH';
-export * from './core/MultiDrawRenderList';
-export * from './core/SquareDataTexture';
+export * from './core/BatchedMeshBVH.js';
+export * from './core/MultiDrawRenderList.js';
+export * from './core/SquareDataTexture.js';
 
-export * from './core/feature/ComputeBVH';
-export * from './core/feature/FrustumCulling';
-export * from './core/feature/GetPositionAt';
-export * from './core/feature/LOD';
-export * from './core/feature/Raycasting';
-export * from './core/feature/Uniforms';
+export * from './core/feature/ComputeBVH.js';
+export * from './core/feature/FrustumCulling.js';
+export * from './core/feature/GetPositionAt.js';
+export * from './core/feature/LOD.js';
+export * from './core/feature/Raycasting.js';
+export * from './core/feature/Uniforms.js';
 
-export * from './patch/ExtendsBatchedMeshPrototype.webgl';
-export * from './patch/PatchBatchedMeshMaterial';
+export * from './patch/ExtendBatchedMeshPrototype.webgl.js';
+export * from './patch/PatchBatchedMeshMaterial.js';
 
-export * from './utils/CountUtils';
-export * from './utils/SortingUtils';
+export * from './utils/CountUtils.js';
+export * from './utils/SortingUtils.js';
 
 /** @internal */
 declare module 'three' {

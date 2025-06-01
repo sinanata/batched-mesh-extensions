@@ -64,7 +64,6 @@ Or you can import it from CDN:
     "three/addons/": "https://cdn.jsdelivr.net/npm/three/examples/jsm/",
     "@three.ez/batched-mesh-extensions": "https://cdn.jsdelivr.net/npm/@three.ez/batched-mesh-extensions/build/webgl.js",
     "bvh.js": "https://cdn.jsdelivr.net/npm/bvh.js/build/index.js",
-    "meshoptimizer": "https://cdn.jsdelivr.net/npm/meshoptimizer@0.23.0/+esm"
   }
 }
 </script>
@@ -81,7 +80,6 @@ Or you can import it from CDN:
     "three/addons/": "https://cdn.jsdelivr.net/npm/three/examples/jsm/",
     "@three.ez/batched-mesh-extensions": "https://cdn.jsdelivr.net/npm/@three.ez/batched-mesh-extensions/build/webgpu.js",
     "bvh.js": "https://cdn.jsdelivr.net/npm/bvh.js/build/index.js",
-    "meshoptimizer": "https://cdn.jsdelivr.net/npm/meshoptimizer@0.23.0/+esm"
   }
 }
 </script>

@@ -1,4 +1,4 @@
-import { extendBatchedMeshPrototypeCommon } from './ExtendsBatchedMeshPrototype.common';
+import { extendBatchedMeshPrototypeCommon } from './ExtendBatchedMeshPrototype.common.js';
 
 /**
  * Enhances the BatchedMesh prototype with additional methods.
