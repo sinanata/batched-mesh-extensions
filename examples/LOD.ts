@@ -2,7 +2,7 @@ import { extendBatchedMeshPrototype, getBatchedMeshCount, getBatchedMeshLODCount
 import { Main, PerspectiveCameraAuto } from '@three.ez/main';
 import { AmbientLight, BatchedMesh, DirectionalLight, Matrix4, MeshLambertMaterial, Scene, SphereGeometry, TorusKnotGeometry, WebGLCoordinateSystem } from 'three';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
-import { simplifyGeometry } from '../src/simplify/simplifyGeometry';
+import { simplifyGeometry } from '../src/simplify/simplifyGeometry.js';
 
 extendBatchedMeshPrototype();
 

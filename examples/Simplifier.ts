@@ -3,8 +3,8 @@ import { Asset, Main, PerspectiveCameraAuto } from '@three.ez/main';
 import { AmbientLight, DirectionalLight, Mesh, MeshNormalMaterial, Scene, TorusKnotGeometry } from 'three';
 import { GLTF, GLTFLoader, OrbitControls } from 'three/examples/jsm/Addons.js';
 import { Pane } from 'tweakpane';
-import { SimplifyParams } from '../src/simplify/simplify';
-import { simplifyGeometry } from '../src/simplify/simplifyGeometry';
+import { SimplifyParams } from '../src/simplify/simplify.js';
+import { simplifyGeometry } from '../src/simplify/simplifyGeometry.js';
 
 extendBatchedMeshPrototype();
 

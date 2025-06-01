@@ -19,6 +19,24 @@
 
 This library adds and overrides some `BatchedMesh` methods to improve performance and add new features.
 
+```ts
+// Extends batchedMesh prototype with new methods
+extendBatchedMeshPrototype();
+
+// Calculate the number of vertices and indices for a batchedMesh and create it
+const { vertexCount, indexCount } = getBatchedMeshCount(geometries);
+const batchedMesh = new BatchedMesh(instanceCount, vertexCount, indexCount, material);
+
+// Add geometries
+const geoId = batchedMesh.addGeometry(geometries[geometryIndex]);
+
+// Add instances
+const instanceId = batchedMesh.addInstance(geoId);
+
+// Compute the BVH to accelerate raycasting and frustum culling after adding all instances
+batchedMesh.computeBVH();
+```
+
 - [**Spatial indexing (dynamic BVH)**](#spatial-indexing-dynamic-bvh): *speed up raycasting and frustum culling.*
 - [**Per-instance uniforms**](#per-instance-uniforms-webglrenderer-only): *assign unique shader data to individual instances.* (**WebGLRenderer only)**
 - [**Level of Detail (LOD)**](#level-of-detail-lod): *dynamically adjust instance detail based on distance.*
@@ -43,6 +61,10 @@ Join us on [Discord](https://discord.gg/MVTwrdX3JM) or open an issue on GitHub.
 ## Like it?
 
 If you like this project, please leave a star. Thank you! ❤️
+
+## Documentation
+
+The documentation is available [here](https://agargaro.github.io/batched-mesh-extensions).
 
 ## Installation
 
@@ -69,7 +91,6 @@ Or you can import it from CDN:
 </script>
 ```
 
-
 ### WebGPURenderer
 
 ```html
@@ -84,6 +105,18 @@ Or you can import it from CDN:
 }
 </script>
 ```
+
+## Extend BatchedMesh prototype
+
+To extend the `BatchedMesh` prototype with the new methods, you need to call the `extendBatchedMeshPrototype()` method at the top of your application.
+
+```ts
+import { extendBatchedMeshPrototype } from '@three.ez/batched-mesh-extensions';
+
+extendBatchedMeshPrototype();
+```
+
+For more advanced use, it's also possible to manually update the `BatchedMesh` prototype because the new methods are all exported.
 
 ## Features
 
