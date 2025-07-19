@@ -3,55 +3,18 @@ import { BatchedMesh, BufferGeometry, Camera, Frustum, Material, Matrix4, Scene,
 import { MultiDrawRenderItem, MultiDrawRenderList } from '../MultiDrawRenderList.js';
 import { sortOpaque, sortTransparent } from '../../utils/SortingUtils.js';
 
-// TODO: fix LOD if no sorting and  no culling
-
-/**
- * A custom sorting callback for render items.
- */
 export type CustomSortCallback = (list: MultiDrawRenderItem[]) => void;
 
-/**
- * Callback invoked when an instance is within the frustum.
- * @param index The index of the instance.
- * @param camera The camera used for rendering.
- * @param cameraLOD The camera used for LOD calculations (provided only if LODs are initialized).
- * @param LODIndex The LOD level of the instance (provided only if LODs are initialized and `sortObjects` is false).
- * @returns True if the instance should be rendered, false otherwise.
- */
 export type OnFrustumEnterCallback = (index: number, camera: Camera, cameraLOD?: Camera, LODIndex?: number) => boolean;
 
 declare module 'three' {
   interface BatchedMesh {
-    /**
-     * Callback function called if an instance is inside the frustum.
-     */
+    occlusionPlanetRadius?: number;
     onFrustumEnter?: OnFrustumEnterCallback;
-
-    /**
-     * Performs frustum culling and sorting.
-     * @param camera The main camera used for rendering.
-     * @param cameraLOD The camera used for LOD calculations (provided only if LODs are initialized).
-     */
     frustumCulling(camera: Camera, cameraLOD?: Camera): void;
-    /**
-     * Updates the index array for indirect rendering.
-     */
     updateIndexArray(): void;
-    /**
-     * Updates the render list based on the current visibility and sorting settings.
-     */
     updateRenderList(): void;
-    /**
-     * Performs BVH frustum culling.
-     * @param camera The main camera used for rendering.
-     * @param cameraLOD The camera used for LOD calculations (provided only if LODs are initialized).
-     */
     BVHCulling(camera: Camera, cameraLOD: Camera): void;
-    /**
-     * Performs linear frustum culling.
-     * @param camera The main camera used for rendering.
-     * @param cameraLOD The camera used for LOD calculations (provided only if LODs are initialized).
-     */
     linearCulling(camera: Camera, cameraLOD: Camera): void;
   }
 }
@@ -62,12 +25,13 @@ const _projScreenMatrix = new Matrix4();
 const _invMatrixWorld = new Matrix4();
 const _forward = new Vector3();
 const _cameraPos = new Vector3();
+const _cameraWorldPos = new Vector3();
 const _cameraLODPos = new Vector3();
 const _position = new Vector3();
 const _sphere = new Sphere();
+const _tempMatrix = new Matrix4();
 
 export function onBeforeRender(this: BatchedMesh, renderer: WebGLRenderer, scene: Scene, camera: Camera, geometry: BufferGeometry, material: Material, group: any): void {
-  // TODO check if nothing changed
   this.frustumCulling(camera);
 }
 
@@ -89,6 +53,7 @@ export function frustumCulling(this: BatchedMesh, camera: Camera, cameraLOD = ca
 
   _invMatrixWorld.copy(this.matrixWorld).invert();
   _cameraPos.setFromMatrixPosition(camera.matrixWorld).applyMatrix4(_invMatrixWorld);
+  _cameraWorldPos.setFromMatrixPosition(camera.matrixWorld);
   _cameraLODPos.setFromMatrixPosition(cameraLOD.matrixWorld).applyMatrix4(_invMatrixWorld);
   _forward.set(0, 0, -1).transformDirection(camera.matrixWorld).transformDirection(_invMatrixWorld);
 
@@ -112,14 +77,14 @@ export function frustumCulling(this: BatchedMesh, camera: Camera, cameraLOD = ca
     if (customSort === null) {
       _renderList.array.sort(!this.material.transparent ? sortOpaque : sortTransparent);
     } else {
-      customSort(_renderList.array); // TODO fix and remove second useless parameter... make a PR on main repo
+      customSort(_renderList.array);
     }
 
     const list = _renderList.array;
     const count = list.length;
     for (let i = 0; i < count; i++) {
       const item = list[i];
-      multiDrawStarts[i] = item.start * bytesPerElement; // TODO multiply bytesPerElement in the renderList?
+      multiDrawStarts[i] = item.start * bytesPerElement;
       multiDrawCounts[i] = item.count;
       indirectArray[i] = item.index;
     }
@@ -165,7 +130,7 @@ export function updateRenderList(this: BatchedMesh): void {
     if (instance.visible && instance.active) {
       const geometryId = instance.geometryIndex;
       const geometryInfo = geometryInfoList[geometryId];
-      const depth = this.getPositionAt(i).sub(_cameraPos).dot(_forward); // getPosition instead of _sphere.center
+      const depth = this.getPositionAt(i, _position).sub(_cameraPos).dot(_forward);
       _renderList.push(i, depth, geometryInfo.start, geometryInfo.count);
     }
   }
@@ -174,8 +139,8 @@ export function updateRenderList(this: BatchedMesh): void {
 }
 
 export function BVHCulling(this: BatchedMesh, camera: Camera, cameraLOD: Camera): void {
-  const index = this.geometry.getIndex();
-  const bytesPerElement = index === null ? 1 : index.array.BYTES_PER_ELEMENT;
+  const indexArr = this.geometry.getIndex();
+  const bytesPerElement = indexArr === null ? 1 : indexArr.array.BYTES_PER_ELEMENT;
   const instanceInfo = this._instanceInfo;
   const geometryInfoList = this._geometryInfo;
   const sortObjects = this.sortObjects;
@@ -183,14 +148,31 @@ export function BVHCulling(this: BatchedMesh, camera: Camera, cameraLOD: Camera)
   const multiDrawCounts = this._multiDrawCounts;
   const indirectArray = this._indirectTexture.image.data as unknown as number[];
   const onFrustumEnter = this.onFrustumEnter;
+  const occlusionPlanetRadius = this.occlusionPlanetRadius;
   let instancesCount = 0;
 
   this.bvh.frustumCulling(_projScreenMatrix, (node: BVHNode<{}, number>) => {
     const index = node.object;
     const instance = instanceInfo[index];
 
-    // we don't check if active because we remove inactive instances from BVH
     if (!instance.visible) return;
+
+    if (occlusionPlanetRadius && instance.isOccludable !== false) {
+      const planetRadiusSq = occlusionPlanetRadius * occlusionPlanetRadius;
+      const camDistSq = _cameraWorldPos.lengthSq();
+
+      if (camDistSq > planetRadiusSq) {
+        this.getBoundingSphereAt(instance.geometryIndex, _sphere).applyMatrix4(this.getMatrixAt(index, _tempMatrix));
+        const dotVal = _cameraWorldPos.dot(_sphere.center);
+
+        if (dotVal > 0) {
+          const term = dotVal - planetRadiusSq;
+          if (term * term > _sphere.radius * _sphere.radius * (camDistSq - planetRadiusSq)) {
+            return;
+          }
+        }
+      }
+    }
 
     const geometryId = instance.geometryIndex;
     const geometryInfo = geometryInfoList[geometryId];
@@ -199,7 +181,7 @@ export function BVHCulling(this: BatchedMesh, camera: Camera, cameraLOD: Camera)
     let count: number;
 
     if (LOD) {
-      const distance = this.getPositionAt(index).distanceToSquared(_cameraLODPos);
+      const distance = this.getPositionAt(index, _position).distanceToSquared(_cameraLODPos);
       const LODIndex = this.getLODIndex(LOD, distance);
       if (onFrustumEnter && !onFrustumEnter(index, camera, cameraLOD, LODIndex)) return;
       start = LOD[LODIndex].start;
@@ -210,11 +192,8 @@ export function BVHCulling(this: BatchedMesh, camera: Camera, cameraLOD: Camera)
       count = geometryInfo.count;
     }
 
-    // TODO don't reuse getPositionAt for sort
-    // TODO LOD optimized if bvh and sort?
-
     if (sortObjects) {
-      const depth = this.getPositionAt(index).sub(_cameraPos).dot(_forward);
+      const depth = this.getPositionAt(index, _position).sub(_cameraPos).dot(_forward);
       _renderList.push(index, depth, start, count);
     } else {
       multiDrawStarts[instancesCount] = start * bytesPerElement;
@@ -237,6 +216,7 @@ export function linearCulling(this: BatchedMesh, camera: Camera, cameraLOD: Came
   const multiDrawCounts = this._multiDrawCounts;
   const indirectArray = this._indirectTexture.image.data as unknown as number[];
   const onFrustumEnter = this.onFrustumEnter;
+  const occlusionPlanetRadius = this.occlusionPlanetRadius;
   let instancesCount = 0;
 
   _frustum.setFromProjectionMatrix(_projScreenMatrix);
@@ -247,23 +227,28 @@ export function linearCulling(this: BatchedMesh, camera: Camera, cameraLOD: Came
 
     const geometryId = instance.geometryIndex;
     const geometryInfo = geometryInfoList[geometryId];
+    this.getBoundingSphereAt(geometryId, _sphere).applyMatrix4(this.getMatrixAt(i, _tempMatrix));
+
+    if (!_frustum.intersectsSphere(_sphere)) continue;
+
+    if (occlusionPlanetRadius && instance.isOccludable !== false) {
+      const planetRadiusSq = occlusionPlanetRadius * occlusionPlanetRadius;
+      const camDistSq = _cameraWorldPos.lengthSq();
+
+      if (camDistSq > planetRadiusSq) {
+        const dotVal = _cameraWorldPos.dot(_sphere.center);
+        if (dotVal > 0) {
+          const term = dotVal - planetRadiusSq;
+          if (term * term > _sphere.radius * _sphere.radius * (camDistSq - planetRadiusSq)) {
+            continue;
+          }
+        }
+      }
+    }
+
     const LOD = geometryInfo.LOD;
     let start: number;
     let count: number;
-
-    const bSphere = geometryInfo.boundingSphere;
-    const radius = bSphere.radius;
-    const center = bSphere.center;
-    const geometryCentered = center.x === 0 && center.y === 0 && center.z === 0; // TODO add to geometryInfo?
-
-    if (geometryCentered) {
-      const maxScale = this.getPositionAndMaxScaleOnAxisAt(i, _sphere.center);
-      _sphere.radius = radius * maxScale;
-    } else {
-      this.applyMatrixAtToSphere(i, _sphere, center, radius);
-    }
-
-    if (!_frustum.intersectsSphere(_sphere)) continue;
 
     if (LOD) {
       const distance = _sphere.center.distanceToSquared(_cameraLODPos);
@@ -276,8 +261,6 @@ export function linearCulling(this: BatchedMesh, camera: Camera, cameraLOD: Came
       start = geometryInfo.start;
       count = geometryInfo.count;
     }
-
-    // TODO LOD optimized if sort?
 
     if (sortObjects) {
       const depth = _position.subVectors(_sphere.center, _cameraPos).dot(_forward);

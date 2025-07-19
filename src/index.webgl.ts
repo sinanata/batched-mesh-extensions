@@ -9,6 +9,7 @@ export * from './core/feature/ComputeBVH.js';
 export * from './core/feature/FrustumCulling.js';
 export * from './core/feature/GetPositionAt.js';
 export * from './core/feature/LOD.js';
+export * from './core/feature/Occlusion.js';
 export * from './core/feature/Raycasting.js';
 export * from './core/feature/Uniforms.js';
 
@@ -21,6 +22,7 @@ export * from './utils/SortingUtils.js';
 /** @internal */
 declare module 'three' {
   interface BatchedMesh {
+    occlusionPlanetRadius?: number;
     _instanceInfo: InstanceInfo[];
     _geometryInfo: GeometryInfo[];
     _indirectTexture: DataTexture;
@@ -37,6 +39,7 @@ export interface InstanceInfo {
   visible: boolean;
   active: boolean;
   geometryIndex: number;
+  isOccludable?: boolean;
 }
 
 /** @internal */

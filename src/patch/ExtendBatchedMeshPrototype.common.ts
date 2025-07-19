@@ -4,6 +4,7 @@ import { BVHCulling, frustumCulling, linearCulling, onBeforeRender, updateIndexA
 import { applyMatrixAtToSphere, getPositionAndMaxScaleOnAxisAt, getPositionAt } from '../core/feature/GetPositionAt.js';
 import { addGeometryLOD, getLODIndex } from '../core/feature/LOD.js';
 import { checkInstanceIntersection, raycast } from '../core/feature/Raycasting.js';
+import { setOccludableAt } from '../core/feature/Occlusion.js';
 
 /**
  * @internal
@@ -28,4 +29,6 @@ export function extendBatchedMeshPrototypeCommon(): void {
 
   BatchedMesh.prototype.raycast = raycast;
   BatchedMesh.prototype.checkInstanceIntersection = checkInstanceIntersection;
+
+  BatchedMesh.prototype.setOccludableAt = setOccludableAt;
 }

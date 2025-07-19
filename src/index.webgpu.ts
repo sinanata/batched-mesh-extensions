@@ -5,6 +5,7 @@ export * from './core/feature/ComputeBVH.js';
 export * from './core/feature/FrustumCulling.js';
 export * from './core/feature/GetPositionAt.js';
 export * from './core/feature/LOD.js';
+export * from './core/feature/Occlusion.js';
 export * from './core/feature/Raycasting.js';
 
 export * from './patch/ExtendBatchedMeshPrototype.webgpu.js';

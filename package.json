@@ -10,14 +10,14 @@
   "types": "src/index.webgl.d.ts",
   "homepage": "https://agargaro.github.io/batched-mesh-extensions/",
   "repository": "https://github.com/agargaro/batched-mesh-extensions",
-  "exports": {
+    "exports": {
     ".": {
       "import": {
-        "types": "./src/index.webgl.d.ts",
+        "types": "./build/index.webgl.d.ts",
         "default": "./build/webgl.js"
       },
       "require": {
-        "types": "./src/index.webgl.d.ts",
+        "types": "./build/index.webgl.d.ts",
         "default": "./build/webgl.cjs"
       }
     }
@@ -49,14 +49,13 @@
   "devDependencies": {
     "@eslint/js": "^9.26.0",
     "@stylistic/eslint-plugin": "^4.2.0",
-    "@three.ez/main": "^0.5.10",
-    "@three.ez/simplify-geometry": "^0.0.1",
     "@tweakpane/core": "^2.0.5",
-    "@types/three": "^0.176.0",
     "eslint": "^9.26.0",
     "meshoptimizer": "^0.23.0",
     "three-mesh-bvh": "^0.9.0",
     "tweakpane": "^4.0.5",
+    "@three.ez/main": "^0.5.10",
+    "@three.ez/simplify-geometry": "^0.0.1",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.32.1",
     "vite": "^6.3.5",
@@ -64,7 +63,8 @@
     "vite-plugin-static-copy": "^3.0.0"
   },
   "peerDependencies": {
-    "three": ">=0.159.0"
+    "three": ">=0.178.0",
+    "@types/three": "^0.178.0"
   },
   "dependencies": {
     "bvh.js": "^0.0.13"
