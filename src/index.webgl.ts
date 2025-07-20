@@ -1,4 +1,4 @@
-import type { Box3, DataTexture, Sphere } from 'three';
+import type { Box3, DataTexture, Sphere, Object3D } from 'three';
 import type { LODInfo } from './core/feature/LOD.js';
 
 export * from './core/BatchedMeshBVH.js';
@@ -22,7 +22,7 @@ export * from './utils/SortingUtils.js';
 /** @internal */
 declare module 'three' {
   interface BatchedMesh {
-    occlusionPlanetRadius?: number;
+    occlusionMesh?: Object3D;
     _instanceInfo: InstanceInfo[];
     _geometryInfo: GeometryInfo[];
     _indirectTexture: DataTexture;
@@ -52,15 +52,12 @@ interface GeometryInfo {
   indexCount: number;
   reservedIndexCount: number;
 
-  // draw range information (ignored if lods present)
   start: number;
   count: number;
 
-  // state
   boundingBox: Box3;
   boundingSphere: Sphere;
   active: boolean;
 
-  // LOD (extends from base)
   LOD: LODInfo[];
 }

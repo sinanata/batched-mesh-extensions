@@ -1,5 +1,5 @@
 import { BVHNode } from 'bvh.js';
-import { BatchedMesh, BufferGeometry, Camera, Frustum, Material, Matrix4, Scene, Sphere, Vector3, WebGLRenderer } from 'three';
+import { BatchedMesh, BufferGeometry, Camera, Frustum, Material, Matrix4, Scene, Sphere, Vector3, WebGLRenderer, Raycaster, Object3D } from 'three';
 import { MultiDrawRenderItem, MultiDrawRenderList } from '../MultiDrawRenderList.js';
 import { sortOpaque, sortTransparent } from '../../utils/SortingUtils.js';
 
@@ -9,7 +9,10 @@ export type OnFrustumEnterCallback = (index: number, camera: Camera, cameraLOD?:
 
 declare module 'three' {
   interface BatchedMesh {
-    occlusionPlanetRadius?: number;
+    occlusionMesh?: Object3D;
+    occlusionTestRate?: number;
+    _occlusionState?: Uint8Array;
+    _occlusionTestCounter?: number;
     onFrustumEnter?: OnFrustumEnterCallback;
     frustumCulling(camera: Camera, cameraLOD?: Camera): void;
     updateIndexArray(): void;
@@ -30,6 +33,7 @@ const _cameraLODPos = new Vector3();
 const _position = new Vector3();
 const _sphere = new Sphere();
 const _tempMatrix = new Matrix4();
+const _occlusionRaycaster = new Raycaster();
 
 export function onBeforeRender(this: BatchedMesh, renderer: WebGLRenderer, scene: Scene, camera: Camera, geometry: BufferGeometry, material: Material, group: any): void {
   this.frustumCulling(camera);
@@ -49,6 +53,13 @@ export function frustumCulling(this: BatchedMesh, camera: Camera, cameraLOD = ca
   if (!perObjectFrustumCulled && !sortObjects) {
     this.updateIndexArray();
     return;
+  }
+
+  this.occlusionTestRate = this.occlusionTestRate ?? 4;
+  this._occlusionTestCounter = this._occlusionTestCounter ?? 0;
+  if (!this._occlusionState || this._occlusionState.length < this.maxInstanceCount) {
+    this._occlusionState = new Uint8Array(this.maxInstanceCount);
+    this._occlusionState.fill(0);
   }
 
   _invMatrixWorld.copy(this.matrixWorld).invert();
@@ -91,6 +102,8 @@ export function frustumCulling(this: BatchedMesh, camera: Camera, cameraLOD = ca
 
     _renderList.reset();
   }
+
+  this._occlusionTestCounter = (this._occlusionTestCounter + 1) % this.occlusionTestRate;
 }
 
 export function updateIndexArray(this: BatchedMesh): void {
@@ -148,8 +161,12 @@ export function BVHCulling(this: BatchedMesh, camera: Camera, cameraLOD: Camera)
   const multiDrawCounts = this._multiDrawCounts;
   const indirectArray = this._indirectTexture.image.data as unknown as number[];
   const onFrustumEnter = this.onFrustumEnter;
-  const occlusionPlanetRadius = this.occlusionPlanetRadius;
   let instancesCount = 0;
+
+  const occlusionTestRate = this.occlusionTestRate!;
+  const occlusionTestCounter = this._occlusionTestCounter!;
+  const occlusionState = this._occlusionState!;
+  const MIN_OCCLUSION_DISTANCE_SQ = 25 * 25;
 
   this.bvh.frustumCulling(_projScreenMatrix, (node: BVHNode<{}, number>) => {
     const index = node.object;
@@ -157,20 +174,36 @@ export function BVHCulling(this: BatchedMesh, camera: Camera, cameraLOD: Camera)
 
     if (!instance.visible) return;
 
-    if (occlusionPlanetRadius && instance.isOccludable !== false) {
-      const planetRadiusSq = occlusionPlanetRadius * occlusionPlanetRadius;
-      const camDistSq = _cameraWorldPos.lengthSq();
+    if (this.occlusionMesh && instance.isOccludable !== false) {
+      const isTestFrame = (index % occlusionTestRate) === occlusionTestCounter;
 
-      if (camDistSq > planetRadiusSq) {
+      if (isTestFrame) {
         this.getBoundingSphereAt(instance.geometryIndex, _sphere).applyMatrix4(this.getMatrixAt(index, _tempMatrix));
-        const dotVal = _cameraWorldPos.dot(_sphere.center);
+        const camToObjDistSq = _cameraWorldPos.distanceToSquared(_sphere.center);
+        _sphere.radius *= 20.0;
 
-        if (dotVal > 0) {
-          const term = dotVal - planetRadiusSq;
-          if (term * term > _sphere.radius * _sphere.radius * (camDistSq - planetRadiusSq)) {
-            return;
+        if (camToObjDistSq < MIN_OCCLUSION_DISTANCE_SQ) {
+          occlusionState[index] = 0;
+        } else {
+          _occlusionRaycaster.ray.origin.copy(_cameraWorldPos);
+          _occlusionRaycaster.ray.direction.copy(_sphere.center).sub(_cameraWorldPos);
+          const distanceToTarget = _occlusionRaycaster.ray.direction.length();
+          _occlusionRaycaster.ray.direction.normalize();
+          _occlusionRaycaster.far = distanceToTarget - _sphere.radius;
+
+          let isOccluded = false;
+          if (_occlusionRaycaster.far > 0.1) {
+            const intersects = _occlusionRaycaster.intersectObject(this.occlusionMesh, false);
+            if (intersects.length > 0) {
+              isOccluded = true;
+            }
           }
+          occlusionState[index] = isOccluded ? 1 : 0;
         }
+      }
+
+      if (occlusionState[index] === 1) {
+        return;
       }
     }
 
@@ -216,8 +249,12 @@ export function linearCulling(this: BatchedMesh, camera: Camera, cameraLOD: Came
   const multiDrawCounts = this._multiDrawCounts;
   const indirectArray = this._indirectTexture.image.data as unknown as number[];
   const onFrustumEnter = this.onFrustumEnter;
-  const occlusionPlanetRadius = this.occlusionPlanetRadius;
   let instancesCount = 0;
+
+  const occlusionTestRate = this.occlusionTestRate!;
+  const occlusionTestCounter = this._occlusionTestCounter!;
+  const occlusionState = this._occlusionState!;
+  const MIN_OCCLUSION_DISTANCE_SQ = 25 * 25;
 
   _frustum.setFromProjectionMatrix(_projScreenMatrix);
 
@@ -231,18 +268,32 @@ export function linearCulling(this: BatchedMesh, camera: Camera, cameraLOD: Came
 
     if (!_frustum.intersectsSphere(_sphere)) continue;
 
-    if (occlusionPlanetRadius && instance.isOccludable !== false) {
-      const planetRadiusSq = occlusionPlanetRadius * occlusionPlanetRadius;
-      const camDistSq = _cameraWorldPos.lengthSq();
+    if (this.occlusionMesh && instance.isOccludable !== false) {
+      const isTestFrame = (i % occlusionTestRate) === occlusionTestCounter;
+      if (isTestFrame) {
+        const camToObjDistSq = _cameraWorldPos.distanceToSquared(_sphere.center);
+        if (camToObjDistSq < MIN_OCCLUSION_DISTANCE_SQ) {
+          occlusionState[i] = 0;
+        } else {
+          _occlusionRaycaster.ray.origin.copy(_cameraWorldPos);
+          _occlusionRaycaster.ray.direction.copy(_sphere.center).sub(_cameraWorldPos);
+          const distanceToTarget = _occlusionRaycaster.ray.direction.length();
+          _occlusionRaycaster.ray.direction.normalize();
+          _occlusionRaycaster.far = distanceToTarget - _sphere.radius;
 
-      if (camDistSq > planetRadiusSq) {
-        const dotVal = _cameraWorldPos.dot(_sphere.center);
-        if (dotVal > 0) {
-          const term = dotVal - planetRadiusSq;
-          if (term * term > _sphere.radius * _sphere.radius * (camDistSq - planetRadiusSq)) {
-            continue;
+          let isOccluded = false;
+          if (_occlusionRaycaster.far > 0.1) {
+            const intersects = _occlusionRaycaster.intersectObject(this.occlusionMesh, false);
+            if (intersects.length > 0) {
+              isOccluded = true;
+            }
           }
+          occlusionState[i] = isOccluded ? 1 : 0;
         }
+      }
+
+      if (occlusionState[i] === 1) {
+        continue;
       }
     }
 
