@@ -1,61 +1,19 @@
 import { Color, ColorManagement, DataTexture, FloatType, IntType, Matrix3, Matrix4, NoColorSpace, PixelFormat, RedFormat, RedIntegerFormat, RGBAFormat, RGBAIntegerFormat, RGFormat, RGIntegerFormat, TextureDataType, TypedArray, UnsignedIntType, Vector2, Vector3, Vector4, WebGLRenderer, WebGLUtils } from 'three';
 
-/**
- * Represents the number of elements per pixel.
- */
 export type ChannelSize = 1 | 2 | 3 | 4;
-/**
- * A constructor signature for creating TypedArray.
- */
 export type TypedArrayConstructor = new (count: number) => TypedArray;
-/**
- * Represents the texture information including its data, size, format, and data type.
- */
 export type TextureInfo = { array: TypedArray; size: number; format: PixelFormat; type: TextureDataType };
-/**
- * Represents information for updating rows in the texture, including the row index and number of rows.
- */
 export type UpdateRowInfo = { row: number; count: number };
-/**
- * Defines the possible types of uniforms that can be used in shaders.
- */
 export type UniformType = 'float' | 'vec2' | 'vec3' | 'vec4' | 'mat3' | 'mat4';
-/**
- * Represents a value that can be used as a uniform.
- */
 export type UniformValueObj = Vector2 | Vector3 | Vector4 | Matrix3 | Matrix4 | Color;
-/**
- * Defines a uniform value as either a number or a compatible Three.js object.
- */
 export type UniformValue = number | UniformValueObj;
-/**
- * Represents the schema for a uniform, defining its offset, size, and type.
- */
 export type UniformMapType = { offset: number; size: number; type: UniformType };
-/**
- * Represents a map of uniform names to their schema definitions.
- */
 export type UniformMap = Map<string, UniformMapType>;
 
-/**
- * Calculates the square texture size based on the capacity and pixels per instance.
- * This ensures the texture is large enough to store all instances in a square layout.
- * @param capacity The maximum number of instances allowed in the texture.
- * @param pixelsPerInstance The number of pixels required for each instance.
- * @returns The size of the square texture needed to store all the instances.
- */
 export function getSquareTextureSize(capacity: number, pixelsPerInstance: number): number {
   return Math.max(pixelsPerInstance, Math.ceil(Math.sqrt(capacity / pixelsPerInstance)) * pixelsPerInstance);
 }
 
-/**
- * Generates texture information (size, format, type) for a square texture based on the provided parameters.
- * @param arrayType The constructor for the TypedArray.
- * @param channels The number of channels in the texture.
- * @param pixelsPerInstance The number of pixels required for each instance.
- * @param capacity The maximum number of instances allowed in the texture.
- * @returns An object containing the texture's array, size, format, and data type.
- */
 export function getSquareTextureInfo(arrayType: TypedArrayConstructor, channels: ChannelSize, pixelsPerInstance: number, capacity: number): TextureInfo {
   if (channels === 3) {
     console.warn('"channels" cannot be 3. Set to 4. More info: https://github.com/mrdoob/three.js/pull/23228');
@@ -84,40 +42,20 @@ export function getSquareTextureInfo(arrayType: TypedArrayConstructor, channels:
   return { array, size, type, format };
 }
 
-/**
- * A class that extends `DataTexture` to manage a square texture optimized for instances rendering.
- * It supports dynamic resizing, partial update based on rows, and allows setting/getting uniforms per instance.
- */
 export class SquareDataTexture extends DataTexture {
-  /**
-   * Whether to enable partial texture updates by row. If `false`, the entire texture will be updated.
-   * @default true.
-   */
   public partialUpdate = true;
-  /**
-   * The maximum number of update calls per frame.
-   * @default Infinity
-   */
   public maxUpdateCalls = Infinity;
-  /** @internal */ _data: TypedArray; // TODO make it public or remove it?
+  /** @internal */ _data: TypedArray;
   protected _channels: ChannelSize;
   protected _pixelsPerInstance: number;
   protected _stride: number;
   protected _rowToUpdate: boolean[];
   protected _uniformMap: UniformMap;
   protected _fetchUniformsInFragmentShader: boolean;
-  protected _utils: WebGLUtils = null; // TODO add it to renderer instead of creating for each texture
+  protected _utils: WebGLUtils = null;
   protected _needsUpdate: boolean = false;
   protected _lastWidth: number = null;
 
-  /**
-   * @param arrayType The constructor for the TypedArray.
-   * @param channels The number of channels in the texture.
-   * @param pixelsPerInstance The number of pixels required for each instance.
-   * @param capacity The total number of instances.
-   * @param uniformMap Optional map for handling uniform values.
-   * @param fetchInFragmentShader Optional flag that determines if uniform values should be fetched in the fragment shader instead of the vertex shader.
-   */
   constructor(arrayType: TypedArrayConstructor, channels: ChannelSize, pixelsPerInstance: number, capacity: number, uniformMap?: UniformMap, fetchInFragmentShader?: boolean) {
     if (channels === 3) channels = 4;
     const { array, format, size, type } = getSquareTextureInfo(arrayType, channels, pixelsPerInstance, capacity);
@@ -129,13 +67,9 @@ export class SquareDataTexture extends DataTexture {
     this._rowToUpdate = new Array(size);
     this._uniformMap = uniformMap;
     this._fetchUniformsInFragmentShader = fetchInFragmentShader;
-    this.needsUpdate = true; // necessary to init texture
+    this.needsUpdate = true;
   }
 
-  /**
-   * Resizes the texture to accommodate a new number of instances.
-   * @param count The new total number of instances.
-   */
   public resize(count: number): void {
     const size = getSquareTextureSize(count, this._pixelsPerInstance);
     if (size === this.image.width) return;
@@ -154,11 +88,6 @@ export class SquareDataTexture extends DataTexture {
     this._data = data;
   }
 
-  /**
-   * Marks a row of the texture for update during the next render cycle.
-   * This helps in optimizing texture updates by only modifying the rows that have changed.
-   * @param index The index of the instance to update.
-   */
   public enqueueUpdate(index: number): void {
     this._needsUpdate = true;
     if (!this.partialUpdate) return;
@@ -168,11 +97,6 @@ export class SquareDataTexture extends DataTexture {
     this._rowToUpdate[rowIndex] = true;
   }
 
-  /**
-   * Updates the texture data based on the rows that need updating.
-   * This method is optimized to only update the rows that have changed, improving performance.
-   * @param renderer The WebGLRenderer used for rendering.
-   */
   public update(renderer: WebGLRenderer): void {
     const textureProperties: any = renderer.properties.get(this);
     const versionChanged = this.version > 0 && textureProperties.__version !== this.version;
@@ -186,7 +110,7 @@ export class SquareDataTexture extends DataTexture {
     this._needsUpdate = false;
 
     if (!this.partialUpdate) {
-      this.needsUpdate = true; // three.js will update the whole texture
+      this.needsUpdate = true;
       return;
     }
 
@@ -194,7 +118,7 @@ export class SquareDataTexture extends DataTexture {
     if (rowsInfo.length === 0) return;
 
     if (rowsInfo.length > this.maxUpdateCalls) {
-      this.needsUpdate = true; // three.js will update the whole texture
+      this.needsUpdate = true;
     } else {
       this.updateRows(textureProperties, renderer, rowsInfo);
     }
@@ -202,7 +126,6 @@ export class SquareDataTexture extends DataTexture {
     this._rowToUpdate.fill(false);
   }
 
-  // TODO reuse same objects to prevent memory leak
   protected getUpdateRowsInfo(): UpdateRowInfo[] {
     const rowsToUpdate = this._rowToUpdate;
     const result: UpdateRowInfo[] = [];
@@ -224,7 +147,7 @@ export class SquareDataTexture extends DataTexture {
     const state = renderer.state;
     const gl = renderer.getContext() as WebGL2RenderingContext;
     // @ts-expect-error Expected 2 arguments, but got 3.
-    this._utils ??= new WebGLUtils(gl, renderer.extensions, renderer.capabilities); // third argument is necessary for older three versions
+    this._utils ??= new WebGLUtils(gl, renderer.extensions, renderer.capabilities);
     const glFormat = this._utils.convert(this.format);
     const glType = this._utils.convert(this.type);
     const { data, width } = this.image;
@@ -248,12 +171,6 @@ export class SquareDataTexture extends DataTexture {
     if (this.onUpdate) this.onUpdate(this);
   }
 
-  /**
-   * Sets a uniform value at the specified instance ID in the texture.
-   * @param id The instance ID to set the uniform for.
-   * @param name The name of the uniform.
-   * @param value The value to set for the uniform.
-   */
   public setUniformAt(id: number, name: string, value: UniformValue): void {
     const { offset, size } = this._uniformMap.get(name);
     const stride = this._stride;
@@ -265,13 +182,6 @@ export class SquareDataTexture extends DataTexture {
     }
   }
 
-  /**
-   * Retrieves a uniform value at the specified instance ID from the texture.
-   * @param id The instance ID to retrieve the uniform from.
-   * @param name The name of the uniform.
-   * @param target Optional target object to store the uniform value.
-   * @returns The uniform value for the specified instance.
-   */
   public getUniformAt(id: number, name: string, target?: UniformValueObj): UniformValue {
     const { offset, size } = this._uniformMap.get(name);
     const stride = this._stride;
@@ -283,59 +193,59 @@ export class SquareDataTexture extends DataTexture {
     return target.fromArray(this._data, id * stride + offset);
   }
 
-  /**
-   * Generates the GLSL code for accessing the uniform data stored in the texture.
-   * @param textureName The name of the texture in the GLSL shader.
-   * @param indexName The name of the index in the GLSL shader.
-   * @param indexType The type of the index in the GLSL shader.
-   * @returns An object containing the GLSL code for the vertex and fragment shaders.
-   */
-  public getUniformsGLSL(textureName: string, indexName: string, indexType: string): { vertex: string; fragment: string } {
+  public getUniformsGLSL(textureName: string, indexName: string, indexType: string): { vertex: { declarations: string; main: string }; fragment: { declarations: string; main: string } } {
     const vertex = this.getUniformsVertexGLSL(textureName, indexName, indexType);
     const fragment = this.getUniformsFragmentGLSL(textureName, indexName, indexType);
     return { vertex, fragment };
   }
 
-  protected getUniformsVertexGLSL(textureName: string, indexName: string, indexType: string): string {
+  protected getUniformsVertexGLSL(textureName: string, indexName: string, indexType: string): { declarations: string; main: string } {
     if (this._fetchUniformsInFragmentShader) {
-      return `
-        flat varying ${indexType} ez_v${indexName}; 
-        void main() {
-          ez_v${indexName} = ${indexName};`;
+      return {
+        declarations: `flat varying ${indexType} ez_v${indexName};`,
+        main: `ez_v${indexName} = ${indexName};`
+      };
     }
 
     const texelsFetch = this.texelsFetchGLSL(textureName, indexName);
     const getFromTexels = this.getFromTexelsGLSL();
     const { assignVarying, declareVarying } = this.getVarying();
 
-    return `
-      uniform highp sampler2D ${textureName};  
-      ${declareVarying}
-      void main() {
+    return {
+      declarations: `
+        uniform highp sampler2D ${textureName};
+        ${declareVarying}
+      `,
+      main: `
         ${texelsFetch}
         ${getFromTexels}
-        ${assignVarying}`;
+        ${assignVarying}
+      `
+    };
   }
 
-  protected getUniformsFragmentGLSL(textureName: string, indexName: string, indexType: string): string {
+  protected getUniformsFragmentGLSL(textureName: string, indexName: string, indexType: string): { declarations: string; main: string } {
     if (!this._fetchUniformsInFragmentShader) {
       const { declareVarying, getVarying } = this.getVarying();
-
-      return `
-      ${declareVarying}
-      void main() {
-        ${getVarying}`;
+      return {
+        declarations: declareVarying,
+        main: getVarying
+      };
     }
 
     const texelsFetch = this.texelsFetchGLSL(textureName, `ez_v${indexName}`);
     const getFromTexels = this.getFromTexelsGLSL();
 
-    return `
-      uniform highp sampler2D ${textureName};  
-      flat varying ${indexType} ez_v${indexName};
-      void main() {
+    return {
+      declarations: `
+        uniform highp sampler2D ${textureName};
+        flat varying ${indexType} ez_v${indexName};
+      `,
+      main: `
         ${texelsFetch}
-        ${getFromTexels}`;
+        ${getFromTexels}
+      `
+    };
   }
 
   protected texelsFetchGLSL(textureName: string, indexName: string): string {

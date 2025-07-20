@@ -1,6 +1,8 @@
 import type { Box3, DataTexture, Sphere, Object3D } from 'three';
 import type { LODInfo } from './core/feature/LOD.js';
 
+import './shaders/ShaderChunks.js';
+
 export * from './core/BatchedMeshBVH.js';
 export * from './core/MultiDrawRenderList.js';
 export * from './core/SquareDataTexture.js';
@@ -12,6 +14,7 @@ export * from './core/feature/LOD.js';
 export * from './core/feature/Occlusion.js';
 export * from './core/feature/Raycasting.js';
 export * from './core/feature/Uniforms.js';
+export * from './core/feature/Skeleton.js';
 
 export * from './patch/ExtendBatchedMeshPrototype.webgl.js';
 export * from './patch/PatchBatchedMeshMaterial.js';
