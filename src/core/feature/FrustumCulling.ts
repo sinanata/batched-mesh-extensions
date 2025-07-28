@@ -13,6 +13,7 @@ declare module 'three' {
     occlusionTestRate?: number;
     _occlusionState?: Uint8Array;
     _occlusionTestCounter?: number;
+    visibleInstances: Set<number>;
     onFrustumEnter?: OnFrustumEnterCallback;
     frustumCulling(camera: Camera, cameraLOD?: Camera): void;
     updateIndexArray(): void;
@@ -49,6 +50,9 @@ export function frustumCulling(this: BatchedMesh, camera: Camera, cameraLOD = ca
 
   const sortObjects = this.sortObjects;
   const perObjectFrustumCulled = this.perObjectFrustumCulled;
+
+  this.visibleInstances = this.visibleInstances ?? new Set<number>();
+  this.visibleInstances.clear();
 
   if (!perObjectFrustumCulled && !sortObjects) {
     this.updateIndexArray();
@@ -207,6 +211,8 @@ export function BVHCulling(this: BatchedMesh, camera: Camera, cameraLOD: Camera)
       }
     }
 
+    this.visibleInstances.add(index);
+
     const geometryId = instance.geometryIndex;
     const geometryInfo = geometryInfoList[geometryId];
     const LOD = geometryInfo.LOD;
@@ -296,6 +302,8 @@ export function linearCulling(this: BatchedMesh, camera: Camera, cameraLOD: Came
         continue;
       }
     }
+
+    this.visibleInstances.add(i);
 
     const LOD = geometryInfo.LOD;
     let start: number;

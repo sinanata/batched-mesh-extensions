@@ -26,6 +26,7 @@ export * from './utils/SortingUtils.js';
 declare module 'three' {
   interface BatchedMesh {
     occlusionMesh?: Object3D;
+    visibleInstances: Set<number>;
     _instanceInfo: InstanceInfo[];
     _geometryInfo: GeometryInfo[];
     _indirectTexture: DataTexture;
