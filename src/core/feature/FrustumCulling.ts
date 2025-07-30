@@ -184,7 +184,7 @@ export function BVHCulling(this: BatchedMesh, camera: Camera, cameraLOD: Camera)
       if (isTestFrame) {
         this.getBoundingSphereAt(instance.geometryIndex, _sphere).applyMatrix4(this.getMatrixAt(index, _tempMatrix));
         const camToObjDistSq = _cameraWorldPos.distanceToSquared(_sphere.center);
-        _sphere.radius *= 20.0;
+        _sphere.radius *= 1.5;
 
         if (camToObjDistSq < MIN_OCCLUSION_DISTANCE_SQ) {
           occlusionState[index] = 0;
